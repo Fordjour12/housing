@@ -1,0 +1,12 @@
+---
+description: Best practices for using Drizzle ORM with your database
+globs: **/*.{ts,js}
+alwaysApply: false
+---
+
+- Use type-safe queries with Drizzle's TypeScript integration
+- Implement proper migrations using Drizzle's migration tools
+- Utilize Drizzle's query builder for complex queries
+- Keep database schema in sync with your TypeScript types
+- Leverage Drizzle's relation system for managing database relationships
+- Use Drizzle's transaction API for atomic operations
