@@ -1,103 +1,336 @@
-import Image from "next/image";
+import Link from "next/link"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Search, Home, Shield, DollarSign, ArrowRight } from "lucide-react"
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="flex min-h-screen flex-col">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Home className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold">RentEasy</span>
+          </div>
+          <nav className="hidden md:flex gap-6">
+            <Link href="#features" className="text-sm font-medium hover:text-primary">
+              Features
+            </Link>
+            <Link href="#how-it-works" className="text-sm font-medium hover:text-primary">
+              How It Works
+            </Link>
+            <Link href="/listings" className="text-sm font-medium hover:text-primary">
+              Listings
+            </Link>
+          </nav>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="text-sm font-medium hover:text-primary hidden sm:inline-flex">
+              Log in
+            </Link>
+            <Button asChild size="sm">
+              <Link href="/signup">Sign up</Link>
+            </Button>
+          </div>
         </div>
+      </header>
+
+      {/* src="/housing-1.jpg" */}
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="relative">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/housing-1.jpg?height=800&width=1600"
+              alt="Rental properties"
+              fill
+              className="object-cover brightness-[0.7]"
+              priority
+            />
+          </div>
+          <div className="container relative z-10 py-24 md:py-32 lg:py-40">
+            <div className="max-w-3xl mx-auto space-y-5 text-white">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+                Find Affordable, Long-Term Rentals in Your Area
+              </h1>
+              <p className="text-lg md:text-xl text-white/90">
+                We connect renters with verified landlords offering month-to-month and longer leases at prices you can
+                afford.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button size="lg" className="w-full sm:w-auto">
+                  <Link href="/listings">Search Rentals Now</Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border-white/20"
+                >
+                  List Your Property
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Search Section */}
+        <section className="bg-muted py-12">
+          <div className="container">
+            <div className=" max-w-4xl mx-auto rounded-xl bg-background p-6 shadow-lg -mt-20 relative z-20">
+              <h2 className="text-2xl font-bold mb-4">Find Your Perfect Rental</h2>
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <Input placeholder="Enter location (city, neighborhood)" className="h-12" />
+                </div>
+                <div className="flex gap-4">
+                  <Button className="h-12 px-6">
+                    <Search className="mr-2 h-4 w-4" />
+                    Search
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="py-16 md:py-24">
+          <div className="container">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Why Choose RentEasy?</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Our platform makes finding and renting properties simple, affordable, and stress-free.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
+                <div className="h-12 w-12 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+                  <DollarSign className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Affordable Options</h3>
+                <p className="text-muted-foreground">
+                  Find rentals that fit your budget with transparent pricing and no hidden fees.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
+                <div className="h-12 w-12 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+                  <Shield className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Verified Landlords</h3>
+                <p className="text-muted-foreground">
+                  Rent with confidence knowing all landlords on our platform have been verified.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center p-6 rounded-lg border bg-card">
+                <div className="h-12 w-12 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+                  <Search className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Easy Search</h3>
+                <p className="text-muted-foreground">
+                  Discover your next home in minutes with our powerful and intuitive search tools.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Listings Section */}
+        <section id="listings" className="py-16 md:py-24 bg-muted">
+          <div className="container">
+            <div className="flex justify-between items-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Featured Listings</h2>
+              <Button variant="outline" asChild>
+                <Link href="/listings">
+                  View all listings
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-lg overflow-hidden border bg-card">
+                  <div className="relative h-48">
+                    <Image
+                      src={`/placeholder.svg?height=400&width=600&text=Property ${i}`}
+                      alt={`Property ${i}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-lg font-bold">Cozy {i} Bedroom Apartment</h3>
+                      <span className="font-bold text-primary">${800 + i * 200}/mo</span>
+                    </div>
+                    <p className="text-muted-foreground text-sm mb-3">Downtown, City Center</p>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <span className="mr-3">{i} bed</span>
+                      <span className="mr-3">{i} bath</span>
+                      <span>{650 + i * 150} sqft</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section id="how-it-works" className="py-16 md:py-24">
+          <div className="container">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">How It Works</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Finding your next rental home is simple with our easy three-step process.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="relative">
+                <div
+                  className="absolute top-0 left-6 -ml-px h-full w-0.5 bg-muted hidden md:block"
+                  aria-hidden="true"
+                />
+                <div className="relative flex items-start group">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white text-xl font-bold relative z-10">
+                    1
+                  </div>
+                  <div className="ml-4 mt-1">
+                    <h3 className="text-xl font-bold mb-2">Search</h3>
+                    <p className="text-muted-foreground">
+                      Enter your location and preferences to browse available rentals in your area.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div
+                  className="absolute top-0 left-6 -ml-px h-full w-0.5 bg-muted hidden md:block"
+                  aria-hidden="true"
+                />
+                <div className="relative flex items-start group">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white text-xl font-bold relative z-10">
+                    2
+                  </div>
+                  <div className="ml-4 mt-1">
+                    <h3 className="text-xl font-bold mb-2">Connect</h3>
+                    <p className="text-muted-foreground">
+                      Message verified landlords directly through our platform to ask questions or schedule viewings.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="relative flex items-start group">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white text-xl font-bold relative z-10">
+                    3
+                  </div>
+                  <div className="ml-4 mt-1">
+                    <h3 className="text-xl font-bold mb-2">Rent</h3>
+                    <p className="text-muted-foreground">
+                      Complete the application process and secure your new home with confidence.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="bg-primary text-primary-foreground py-16 md:py-24">
+          <div className="container text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Ready to Find Your Next Home?</h2>
+            <p className="text-lg text-primary-foreground/90 max-w-2xl mx-auto mb-8">
+              Join thousands of happy renters who found their perfect home on RentEasy.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" variant="secondary">
+                <Link href="/listings">Search Rentals Now</Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="bg-transparent border-primary-foreground/20 hover:bg-primary-foreground/10"
+              >
+                List Your Property
+              </Button>
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="border-t py-12">
+        <div className="container">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-2 mb-4">
+                <Home className="h-6 w-6 text-primary" />
+                <span className="text-xl font-bold">RentEasy</span>
+              </div>
+              <p className="text-muted-foreground max-w-xs">
+                Making long-term rentals accessible, affordable, and stress-free for everyone.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#" className="text-muted-foreground hover:text-primary">
+                    Search Rentals
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-muted-foreground hover:text-primary">
+                    List a Property
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-muted-foreground hover:text-primary">
+                    How It Works
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-muted-foreground hover:text-primary">
+                    About Us
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Legal</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#" className="text-muted-foreground hover:text-primary">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-muted-foreground hover:text-primary">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-muted-foreground hover:text-primary">
+                    Cookie Policy
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 pt-8 border-t text-center text-muted-foreground">
+            <p>© {new Date().getFullYear()} RentEasy. All rights reserved.</p>
+          </div>
+        </div>
       </footer>
     </div>
-  );
+  )
 }
