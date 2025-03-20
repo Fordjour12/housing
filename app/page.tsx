@@ -10,7 +10,7 @@ export default function LandingPage() {
     <div className="flex min-h-screen flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container mx-auto flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Home className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">RentEasy</span>
@@ -36,7 +36,7 @@ export default function LandingPage() {
               Log in
             </Link>
             <Button asChild size="sm">
-              <Link href="/signup">Sign up</Link>
+              <Link href="/register">Sign up</Link>
             </Button>
           </div>
         </div>
@@ -47,7 +47,7 @@ export default function LandingPage() {
         <section className="relative">
           <div className="absolute inset-0 z-0">
             <Image
-              src="/placeholder.svg?height=800&width=1600"
+              src="/housing-1.jpg?height=800&width=1600"
               alt="Rental properties"
               fill
               className="object-cover brightness-[0.7]"
@@ -55,7 +55,7 @@ export default function LandingPage() {
             />
           </div>
           <div className="container relative z-10 py-24 md:py-32 lg:py-40">
-            <div className="max-w-3xl space-y-5 text-white">
+            <div className="max-w-3xl mx-auto space-y-5 text-white">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
                 Find Affordable, Long-Term Rentals in Your Area
               </h1>
@@ -81,8 +81,8 @@ export default function LandingPage() {
 
         {/* Search Section */}
         <section className="bg-muted py-12">
-          <div className="container">
-            <div className="mx-auto max-w-4xl rounded-xl bg-background p-6 shadow-lg -mt-20 relative z-20">
+          <div className="container mx-auto">
+            <div className="max-w-4xl mx-auto rounded-xl bg-background p-6 shadow-lg -mt-20 relative z-20">
               <h2 className="text-2xl font-bold mb-4">Find Your Perfect Rental</h2>
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
@@ -101,7 +101,7 @@ export default function LandingPage() {
 
         {/* Features Section */}
         <section id="features" className="py-16 md:py-24">
-          <div className="container">
+          <div className="container mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Why Choose RentEasy?</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -145,7 +145,7 @@ export default function LandingPage() {
 
         {/* Featured Listings Section */}
         <section id="listings" className="py-16 md:py-24 bg-muted">
-          <div className="container">
+          <div className="container mx-auto">
             <div className="flex justify-between items-center mb-12">
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Featured Listings</h2>
               <Button variant="outline" asChild>
@@ -187,7 +187,7 @@ export default function LandingPage() {
 
         {/* How It Works Section */}
         <section id="how-it-works" className="py-16 md:py-24">
-          <div className="container">
+          <div className="container mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">How It Works</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -250,7 +250,7 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-primary text-primary-foreground py-16 md:py-24">
+        <section className="bg-primary/80 text-primary-foreground py-16 md:py-24">
           <div className="container text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Ready to Find Your Next Home?</h2>
             <p className="text-lg text-primary-foreground/90 max-w-2xl mx-auto mb-8">
@@ -274,7 +274,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t py-12">
-        <div className="container">
+        <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
