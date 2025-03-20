@@ -25,11 +25,19 @@ export const register = async (
 	firstName: string,
 	lastName: string,
 ) => {
-	await auth.api.signUpEmail({
-		body: {
-			email: email,
-			password: password,
-			name: `${firstName} ${lastName}`,
-		},
-	});
+	try {
+		const result = await auth.api.signUpEmail({
+			body: {
+				email: email,
+				password: password,
+				name: `${firstName} ${lastName}`,
+			},
+		});
+		return { success: true, data: result };
+	} catch (error) {
+		return { 
+			success: false, 
+			error: error instanceof Error ? error.message : "An unknown error occurred" 
+		};
+	}
 };
