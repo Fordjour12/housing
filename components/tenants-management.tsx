@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Table,
@@ -17,6 +20,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import TenantDetailsDialog from "./tenant-details-dialog";
 
 // Mock data - replace with real data fetching
 const tenants = [
@@ -50,6 +54,10 @@ const tenants = [
 ];
 
 export default function TenantsManagement() {
+	const [selectedTenant, setSelectedTenant] = useState<
+		(typeof tenants)[0] | null
+	>(null);
+
 	return (
 		<div className="space-y-6">
 			<div className="flex justify-between items-center">
@@ -115,7 +123,11 @@ export default function TenantsManagement() {
 										<DropdownMenuContent align="end">
 											<DropdownMenuLabel>Actions</DropdownMenuLabel>
 											<DropdownMenuSeparator />
-											<DropdownMenuItem>View Details</DropdownMenuItem>
+											<DropdownMenuItem
+												onSelect={() => setSelectedTenant(tenant)}
+											>
+												View Details
+											</DropdownMenuItem>
 											<DropdownMenuItem>Edit Tenant</DropdownMenuItem>
 											<DropdownMenuItem>Manage Lease</DropdownMenuItem>
 											<DropdownMenuSeparator />
@@ -130,6 +142,14 @@ export default function TenantsManagement() {
 					</TableBody>
 				</Table>
 			</div>
+
+			{selectedTenant && (
+				<TenantDetailsDialog
+					tenant={selectedTenant}
+					open={!!selectedTenant}
+					onOpenChange={(open) => !open && setSelectedTenant(null)}
+				/>
+			)}
 		</div>
 	);
 }
