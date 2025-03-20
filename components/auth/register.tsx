@@ -38,19 +38,23 @@ export default function RegisterForm() {
 	// 2. Define a submit handler.
 	const router = useRouter();
 	async function onSubmit(values: z.infer<typeof registerSchema>) {
-		await register(
-			values.email,
-			values.password,
-			values.firstName,
-			values.lastName,
-		);
-
-		toast.success("Account created successfully");
-		router.push("/listings");
-
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
-		console.log(values);
+		try {
+			await register(
+				values.email,
+				values.password,
+				values.firstName,
+				values.lastName,
+			);
+			
+			toast.success("Account created successfully");
+			router.push("/listings");
+			
+			// Do something with the form values.
+			// ✅ This will be type-safe and validated.
+		} catch (error) {
+			console.error("Registration error:", error);
+			toast.error("Failed to create account. Please try again.");
+		}
 	}
 	return (
 		<section className="flex min-h-scree bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
