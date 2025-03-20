@@ -1,8 +1,11 @@
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+// import { initGoogleMaps } from "./services/geocoding";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -76,24 +79,24 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
+  // TODO: find a better place for this its not welcome here
+  // useEffect(() => {
+  //   if (process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
+  //     initGoogleMaps(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)
+  //   }
+  // }, [])
+
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+      <body className={cn(geistSans.variable, geistMono.variable)}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
           <Toaster />
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
