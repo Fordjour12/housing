@@ -3,12 +3,20 @@
 import { auth } from "@/lib/auth";
 
 export const login = async (email: string, password: string) => {
-	await auth.api.signInEmail({
-		body: {
-			email: email,
-			password: password,
-		},
-	});
+	try {
+		const result = await auth.api.signInEmail({
+			body: {
+				email: email,
+				password: password,
+			},
+		});
+		return { success: true, data: result };
+	} catch (error) {
+		return { 
+			success: false, 
+			error: error instanceof Error ? error.message : "An unknown error occurred" 
+		};
+	}
 };
 
 export const register = async (
