@@ -62,9 +62,7 @@ export default function LoginForm() {
 							<h1 className="mb-1 mt-4 text-xl font-semibold">
 								Log In To RentEasy
 							</h1>
-							<p className="text-sm">
-								Welcome to RentEasy! Log In to continue
-							</p>
+							<p className="text-sm">Welcome to RentEasy! Log In to continue</p>
 						</div>
 					</div>
 					<div className="mt-6 grid grid-cols-2 gap-3 px-4">

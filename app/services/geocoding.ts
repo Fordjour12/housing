@@ -3,14 +3,24 @@ import { Loader } from "@googlemaps/js-api-loader"
 let googleMapsLoader: Promise<typeof google.maps>
 
 export async function initGoogleMaps(apiKey: string) {
+  console.log("Initializing Google Maps with API key:", apiKey ? "API key provided" : "No API key");
+  
   if (!googleMapsLoader) {
+    console.log("Creating new Google Maps loader instance");
     const loader = new Loader({
       apiKey,
       version: "weekly",
       libraries: ["places", "geometry"],
     })
-    googleMapsLoader = loader.load()
+    googleMapsLoader = loader.load() as unknown as Promise<typeof google.maps>
+    
+    googleMapsLoader
+      .then(() => console.log("Google Maps loaded successfully"))
+      .catch(error => console.error("Failed to load Google Maps:", error));
+  } else {
+    console.log("Using existing Google Maps loader instance");
   }
+  
   return googleMapsLoader
 }
 
