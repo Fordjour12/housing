@@ -89,7 +89,7 @@ export default function AdvancedSearch({ onSearch, onSaveSearch, savedSearches =
             onValueChange={(value) =>
               setSearchCriteria({
                 ...searchCriteria,
-                location: { ...searchCriteria.location, radius: parseInt(value) },
+                location: { ...searchCriteria.location, radius: Number.parseInt(value) },
               })
             }
           >
@@ -143,20 +143,21 @@ export default function AdvancedSearch({ onSearch, onSaveSearch, savedSearches =
               <Input
                 placeholder="Enter work/school address"
                 value={searchCriteria.commute?.to.address || ""}
-                onChange={(e) =>
+                onChange={async (e) => {
+                  const coords = await geocodeAddress(e.target.value) ?? { lat: 0, lng: 0 };
                   setSearchCriteria({
                     ...searchCriteria,
                     commute: {
                       ...searchCriteria.commute,
                       to: {
                         address: e.target.value,
-                        coordinates: await geocodeAddress(e.target.value) || { lat: 0, lng: 0 },
+                        coordinates: coords,
                       },
                       maxTime: searchCriteria.commute?.maxTime || 30,
                       transportMode: searchCriteria.commute?.transportMode || "driving",
                     },
-                  })
-                }
+                  });
+                }}
               />
             </div>
             <div className="space-y-2">
@@ -166,13 +167,11 @@ export default function AdvancedSearch({ onSearch, onSaveSearch, savedSearches =
                 onValueChange={(value) =>
                   setSearchCriteria({
                     ...searchCriteria,
-setSearchCriteria({
-  ...searchCriteria,
-  commute: {
-    ...searchCriteria.commute || {},
-    maxTime: parseInt(value),
-  },
-})
+                    commute: {
+                      ...searchCriteria.commute || {},
+                      maxTime: parseInt(value),
+                    },
+                  })
                 }
               >
                 <SelectTrigger>
@@ -195,7 +194,7 @@ setSearchCriteria({
                   setSearchCriteria({
                     ...searchCriteria,
                     commute: {
-                      ...searchCriteria.commute!,
+                      ...searchCriteria.commute || {},
                       transportMode: value,
                     },
                   })
@@ -214,7 +213,6 @@ setSearchCriteria({
             </div>
           </div>
         )}
-      </div>
 
       {/* Save Search */}
       <div className="space-y-2">
