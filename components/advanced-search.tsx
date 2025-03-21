@@ -150,7 +150,7 @@ export default function AdvancedSearch({ onSearch, onSaveSearch, savedSearches =
                       ...searchCriteria.commute,
                       to: {
                         address: e.target.value,
-                        coordinates: { lat: 0, lng: 0 }, // This would be set by geocoding
+                        coordinates: await geocodeAddress(e.target.value) || { lat: 0, lng: 0 },
                       },
                       maxTime: searchCriteria.commute?.maxTime || 30,
                       transportMode: searchCriteria.commute?.transportMode || "driving",
