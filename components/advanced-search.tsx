@@ -166,11 +166,13 @@ export default function AdvancedSearch({ onSearch, onSaveSearch, savedSearches =
                 onValueChange={(value) =>
                   setSearchCriteria({
                     ...searchCriteria,
-                    commute: {
-                      ...searchCriteria.commute!,
-                      maxTime: parseInt(value),
-                    },
-                  })
+setSearchCriteria({
+  ...searchCriteria,
+  commute: {
+    ...searchCriteria.commute || {},
+    maxTime: parseInt(value),
+  },
+})
                 }
               >
                 <SelectTrigger>
