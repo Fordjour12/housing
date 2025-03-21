@@ -175,16 +175,19 @@ export default function ListingsWithMap() {
 
     // Add distance calculation if radius is specified
     if (criteria.location.coordinates && criteria.location.radius) {
+      const { lat: originLat, lng: originLng } = criteria.location.coordinates
+      const radius = criteria.location.radius
+
       filtered = filtered.map(listing => ({
         ...listing,
         distance: calculateDistance(
-          criteria.location.coordinates!.lat,
-          criteria.location.coordinates!.lng,
+          originLat,
+          originLng,
           listing.lat,
           listing.lng
         )
       })).filter(listing =>
-        listing.distance! <= criteria.location.radius!
+        listing.distance !== undefined && listing.distance <= radius
       )
     }
 
