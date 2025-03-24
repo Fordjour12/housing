@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export const login = async (email: string, password: string) => {
 	try {
@@ -12,9 +13,10 @@ export const login = async (email: string, password: string) => {
 		});
 		return { success: true, data: result };
 	} catch (error) {
-		return { 
-			success: false, 
-			error: error instanceof Error ? error.message : "An unknown error occurred" 
+		return {
+			success: false,
+			error:
+				error instanceof Error ? error.message : "An unknown error occurred",
 		};
 	}
 };
@@ -35,9 +37,26 @@ export const register = async (
 		});
 		return { success: true, data: result };
 	} catch (error) {
-		return { 
-			success: false, 
-			error: error instanceof Error ? error.message : "An unknown error occurred" 
+		return {
+			success: false,
+			error:
+				error instanceof Error ? error.message : "An unknown error occurred",
+		};
+	}
+};
+
+export const userSession = async () => {
+	try {
+		const session = await auth.api.getSession({
+			headers: await headers(),
+		});
+		console.log("session =>", session);
+		return { success: true, data: session };
+	} catch (error) {
+		return {
+			success: false,
+			error:
+				error instanceof Error ? error.message : "An unknown error occurred",
 		};
 	}
 };

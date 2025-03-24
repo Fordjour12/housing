@@ -15,11 +15,14 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
-import { register } from "@/server/user";
+import { register } from "@/actions/server/user";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function RegisterForm() {
+	const [isLoading, setIsLoading] = useState(false);
 	const form = useForm<z.infer<RegisterSchema>>({
 		resolver: zodResolver(registerSchema),
 		resetOptions: {
@@ -37,21 +40,24 @@ export default function RegisterForm() {
 	const router = useRouter();
 	async function onSubmit(values: z.infer<typeof registerSchema>) {
 		try {
+			setIsLoading(true);
 			await register(
 				values.email,
 				values.password,
 				values.firstName,
 				values.lastName,
 			);
-			
+
 			toast.success("Account created successfully");
 			router.push("/listings");
-			
+
 			// Do something with the form values.
 			// ✅ This will be type-safe and validated.
 		} catch (error) {
 			console.error("Registration error:", error);
 			toast.error("Failed to create account. Please try again.");
+		} finally {
+			setIsLoading(false);
 		}
 	}
 	return (
@@ -75,7 +81,7 @@ export default function RegisterForm() {
 						</div>
 					</div>
 					<div className="mt-6 grid grid-cols-2 gap-3 px-4">
-						<Button type="button" variant="outline">
+						<Button type="button" variant="outline" disabled={isLoading}>
 							{/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +109,7 @@ export default function RegisterForm() {
 							</svg>
 							<span>Google</span>
 						</Button>
-						<Button type="button" variant="outline">
+						<Button type="button" variant="outline" disabled={isLoading}>
 							{/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -131,7 +137,7 @@ export default function RegisterForm() {
 									<FormItem>
 										<FormLabel>First Name</FormLabel>
 										<FormControl>
-											<Input type="text" {...field} />
+											<Input type="text" disabled={isLoading} {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -145,7 +151,7 @@ export default function RegisterForm() {
 									<FormItem>
 										<FormLabel>Last Name</FormLabel>
 										<FormControl>
-											<Input type="text" {...field} />
+											<Input type="text" disabled={isLoading} {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -160,7 +166,7 @@ export default function RegisterForm() {
 									<FormItem>
 										<FormLabel>Email</FormLabel>
 										<FormControl>
-											<Input type="email" {...field} />
+											<Input type="email" disabled={isLoading} {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -176,19 +182,34 @@ export default function RegisterForm() {
 									<FormItem>
 										<FormLabel>Password</FormLabel>
 										<FormControl>
-											<Input type="password" {...field} />
+											<Input type="password" disabled={isLoading} {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
 						</div>
-						<Button className="w-full">Sign Up</Button>
+
+						<Button className="w-full" disabled={isLoading}>
+							{isLoading ? (
+								<>
+									<Loader2 className="h-4 w-4 animate-spin" />
+									Creating account...
+								</>
+							) : (
+								"Sign Up"
+							)}
+						</Button>
 					</div>
 					<div className="bg-muted rounded-(--radius) border p-3">
 						<p className="text-accent-foreground text-center text-sm">
 							Already have an account ?
-							<Button asChild variant="link" className="px-2">
+							<Button
+								asChild
+								variant="link"
+								className="px-2"
+								disabled={isLoading}
+							>
 								<Link href="/login">Login</Link>
 							</Button>
 						</p>

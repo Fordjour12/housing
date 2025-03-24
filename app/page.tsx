@@ -9,9 +9,27 @@ import {
 	DollarSign,
 	ArrowRight,
 	MessageSquare,
+	Bell,
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import SignOut from "@/actions/client/signout";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
+
 	return (
 		<div className="flex min-h-screen flex-col">
 			{/* Header */}
@@ -44,15 +62,60 @@ export default function LandingPage() {
 						</Link>
 					</nav>
 					<div className="flex items-center gap-4">
-						<Link
-							href="/login"
-							className="text-sm font-medium hover:text-primary hidden sm:inline-flex"
-						>
-							Log in
-						</Link>
-						<Button asChild size="sm">
-							<Link href="/register">Sign up</Link>
-						</Button>
+						{session?.user ? (
+							<>
+								<Link href="/messages" className="relative">
+									<MessageSquare className="h-5 w-5" />
+									<Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0">
+										3
+									</Badge>
+									<span className="sr-only">Messages</span>
+								</Link>
+								<Link href="/notifications" className="relative">
+									<Bell className="h-5 w-5" />
+									<Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0">
+										2
+									</Badge>
+									<span className="sr-only">Notifications</span>
+								</Link>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Avatar className="cursor-pointer">
+											{/* <AvatarImage src={session.user?.image} /> */}
+											<AvatarFallback>
+												{session.user?.name?.charAt(0) || "U"}
+											</AvatarFallback>
+										</Avatar>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end">
+										<DropdownMenuLabel>My Account</DropdownMenuLabel>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem asChild>
+											<Link href="/dashboard">Dashboard</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem asChild>
+											<Link href="/profile">Profile</Link>
+										</DropdownMenuItem>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem asChild>
+											<SignOut />
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</>
+						) : (
+							<>
+								<Link
+									href="/login"
+									className="text-sm font-medium hover:text-primary hidden sm:inline-flex"
+								>
+									Log in
+								</Link>
+								<Button asChild size="sm">
+									<Link href="/register">Sign up</Link>
+								</Button>
+							</>
+						)}
 					</div>
 				</div>
 			</header>

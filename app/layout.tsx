@@ -85,12 +85,6 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<head>
-				<script
-					async
-					src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-				/>
-			</head>
 			<body className={cn(geistSans.variable, geistMono.variable)}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					{children}
