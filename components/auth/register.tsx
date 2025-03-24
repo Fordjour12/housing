@@ -15,14 +15,15 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
-import { register } from "@/actions/server/user";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useUser } from "@/context/user-context";
 
 export default function RegisterForm() {
 	const [isLoading, setIsLoading] = useState(false);
+	const { register } = useUser();
 	const form = useForm<z.infer<RegisterSchema>>({
 		resolver: zodResolver(registerSchema),
 		resetOptions: {
@@ -41,18 +42,21 @@ export default function RegisterForm() {
 	async function onSubmit(values: z.infer<typeof registerSchema>) {
 		try {
 			setIsLoading(true);
-			await register(
+			const result = await register(
 				values.email,
 				values.password,
 				values.firstName,
 				values.lastName,
 			);
 
-			toast.success("Account created successfully");
-			router.push("/listings");
-
-			// Do something with the form values.
-			// ✅ This will be type-safe and validated.
+			if (result.success) {
+				toast.success("Account created successfully");
+				router.push("/listings");
+			} else {
+				toast.error(
+					result.error || "Failed to create account. Please try again.",
+				);
+			}
 		} catch (error) {
 			console.error("Registration error:", error);
 			toast.error("Failed to create account. Please try again.");

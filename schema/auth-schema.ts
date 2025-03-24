@@ -6,6 +6,7 @@ import {
 	boolean,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { role, userRole } from "./role-schema";
 
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
@@ -13,13 +14,21 @@ export const user = pgTable("user", {
 	email: text("email").notNull().unique(),
 	emailVerified: boolean("email_verified").notNull(),
 	image: text("image"),
+	role: text("role"), // Reference to the role.id
+	onboardingCompleted: boolean("onboarding_completed").default(false),
 	createdAt: timestamp("created_at").notNull(),
 	updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ many, one }) => ({
 	sessions: many(session),
 	accounts: many(account),
+	userRoles: many(userRole),
+	// For direct role reference in user table
+	primaryRole: one(role, {
+		fields: [user.role],
+		references: [role.id],
+	}),
 	// properties: many(property),
 	// favorites: many(favorite),
 }));

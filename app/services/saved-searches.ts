@@ -1,4 +1,4 @@
-import type { Listing, SavedSearch, SearchCriteria } from "@/app/types/search";
+import type { Listing, SavedSearch, SearchCriteria } from "@/types/search";
 import { calculateHaversineDistance } from "@/app/services/geocoding";
 
 export async function saveSearch(

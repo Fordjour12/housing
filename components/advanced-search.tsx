@@ -1,4 +1,4 @@
-import type { SavedSearch, SearchCriteria } from "@/app/types/search";
+import type { SavedSearch, SearchCriteria } from "@/types/search";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
