@@ -5,6 +5,7 @@ import {
 	timestamp,
 	boolean,
 } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
@@ -15,6 +16,13 @@ export const user = pgTable("user", {
 	createdAt: timestamp("created_at").notNull(),
 	updatedAt: timestamp("updated_at").notNull(),
 });
+
+export const userRelations = relations(user, ({ many }) => ({
+	sessions: many(session),
+	accounts: many(account),
+	// properties: many(property),
+	// favorites: many(favorite),
+}));
 
 export const session = pgTable("session", {
 	id: text("id").primaryKey(),
@@ -28,6 +36,13 @@ export const session = pgTable("session", {
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 });
+
+export const sessionRelations = relations(session, ({ one }) => ({
+	user: one(user, {
+		fields: [session.userId],
+		references: [user.id],
+	}),
+}));
 
 export const account = pgTable("account", {
 	id: text("id").primaryKey(),
@@ -47,6 +62,13 @@ export const account = pgTable("account", {
 	updatedAt: timestamp("updated_at").notNull(),
 });
 
+export const accountRelations = relations(account, ({ one }) => ({
+	user: one(user, {
+		fields: [account.userId],
+		references: [user.id],
+	}),
+}));
+
 export const verification = pgTable("verification", {
 	id: text("id").primaryKey(),
 	identifier: text("identifier").notNull(),
@@ -56,9 +78,58 @@ export const verification = pgTable("verification", {
 	updatedAt: timestamp("updated_at"),
 });
 
+// export const property = pgTable("property", {
+// 	id: text("id").primaryKey(),
+// 	title: text("title").notNull(),
+// 	description: text("description"),
+// 	address: text("address").notNull(),
+// 	price: integer("price").notNull(),
+// 	bedrooms: integer("bedrooms"),
+// 	bathrooms: integer("bathrooms"),
+// 	squareFeet: integer("square_feet"),
+// 	isAvailable: boolean("is_available").notNull().default(true),
+// 	ownerId: text("owner_id")
+// 		.notNull()
+// 		.references(() => user.id, { onDelete: "cascade" }),
+// 	createdAt: timestamp("created_at").notNull().defaultNow(),
+// 	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+// });
+
+// export const propertyRelations = relations(property, ({ one, many }) => ({
+// 	owner: one(user, {
+// 		fields: [property.ownerId],
+// 		references: [user.id],
+// 	}),
+// 	favorites: many(favorite),
+// }));
+
+// export const favorite = pgTable("favorite", {
+// 	id: text("id").primaryKey(),
+// 	userId: text("user_id")
+// 		.notNull()
+// 		.references(() => user.id, { onDelete: "cascade" }),
+// 	propertyId: text("property_id")
+// 		.notNull()
+// 		.references(() => property.id, { onDelete: "cascade" }),
+// 	createdAt: timestamp("created_at").notNull().defaultNow(),
+// });
+
+// export const favoriteRelations = relations(favorite, ({ one }) => ({
+// 	user: one(user, {
+// 		fields: [favorite.userId],
+// 		references: [user.id],
+// 	}),
+// 	property: one(property, {
+// 		fields: [favorite.propertyId],
+// 		references: [property.id],
+// 	}),
+// }));
+
 type User = typeof user.$inferSelect;
 type Session = typeof session.$inferSelect;
 type Account = typeof account.$inferSelect;
 type Verification = typeof verification.$inferSelect;
+// type Property = typeof property.$inferSelect;
+// type Favorite = typeof favorite.$inferSelect;
 
 export type { User, Session, Account, Verification };

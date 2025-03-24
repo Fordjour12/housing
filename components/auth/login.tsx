@@ -15,12 +15,15 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
-import { login } from "@/server/user";
+import { login } from "@/actions/server/user";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function LoginForm() {
+	const [isLoading, setIsLoading] = useState(false);
 	const form = useForm<z.infer<LoginSchema>>({
 		resolver: zodResolver(loginSchema),
 		resetOptions: {
@@ -36,6 +39,7 @@ export default function LoginForm() {
 	const router = useRouter();
 	async function onSubmit(values: z.infer<LoginSchema>) {
 		try {
+			setIsLoading(true);
 			await login(values.email, values.password);
 			toast.success("Login successful");
 			router.push("/listings");
@@ -45,6 +49,8 @@ export default function LoginForm() {
 		} catch (error) {
 			console.error("Login error:", error);
 			toast.error("Failed to login. Please try again.");
+		} finally {
+			setIsLoading(false);
 		}
 	}
 	return (
@@ -66,7 +72,7 @@ export default function LoginForm() {
 						</div>
 					</div>
 					<div className="mt-6 grid grid-cols-2 gap-3 px-4">
-						<Button type="button" variant="outline">
+						<Button type="button" variant="outline" disabled={isLoading}>
 							{/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -94,7 +100,7 @@ export default function LoginForm() {
 							</svg>
 							<span>Google</span>
 						</Button>
-						<Button type="button" variant="outline">
+						<Button type="button" variant="outline" disabled={isLoading}>
 							{/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +128,7 @@ export default function LoginForm() {
 									<FormItem>
 										<FormLabel>Email</FormLabel>
 										<FormControl>
-											<Input type="email" {...field} />
+											<Input type="email" disabled={isLoading} {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -138,19 +144,33 @@ export default function LoginForm() {
 									<FormItem>
 										<FormLabel>Password</FormLabel>
 										<FormControl>
-											<Input type="password" {...field} />
+											<Input type="password" disabled={isLoading} {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
 								)}
 							/>
 						</div>
-						<Button className="w-full">Login</Button>
+						<Button className="w-full" disabled={isLoading}>
+							{isLoading ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Logging in...
+								</>
+							) : (
+								"Login"
+							)}
+						</Button>
 					</div>
 					<div className="bg-muted rounded-(--radius) border p-3">
 						<p className="text-accent-foreground text-center text-sm">
 							Don't have an account?
-							<Button asChild variant="link" className="px-2">
+							<Button
+								asChild
+								variant="link"
+								className="px-2"
+								disabled={isLoading}
+							>
 								<Link href="/register">Sign Up</Link>
 							</Button>
 						</p>
