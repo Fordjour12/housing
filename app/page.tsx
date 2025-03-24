@@ -2,28 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-	Search,
-	Home,
-	Shield,
-	DollarSign,
-	ArrowRight,
-	MessageSquare,
-	Bell,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Search, Home, Shield, DollarSign, ArrowRight } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import SignOut from "@/actions/client/signout";
+import Header from "@/components/header";
 
 export default async function LandingPage() {
 	const session = await auth.api.getSession({
@@ -32,93 +14,7 @@ export default async function LandingPage() {
 
 	return (
 		<div className="flex min-h-screen flex-col">
-			{/* Header */}
-			<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-				<div className="container mx-auto flex h-16 items-center justify-between">
-					<div className="flex items-center gap-2">
-						<Link href="/" className="flex items-center gap-2">
-							<Home className="h-6 w-6 text-primary" />
-							<span className="text-xl font-bold">RentEasy</span>
-						</Link>
-					</div>
-					<nav className="hidden md:flex gap-6">
-						<Link
-							href="#features"
-							className="text-sm font-medium hover:text-primary"
-						>
-							Features
-						</Link>
-						<Link
-							href="#how-it-works"
-							className="text-sm font-medium hover:text-primary"
-						>
-							How It Works
-						</Link>
-						<Link
-							href="/listings"
-							className="text-sm font-medium hover:text-primary"
-						>
-							Listings
-						</Link>
-					</nav>
-					<div className="flex items-center gap-4">
-						{session?.user ? (
-							<>
-								<Link href="/messages" className="relative">
-									<MessageSquare className="h-5 w-5" />
-									<Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0">
-										3
-									</Badge>
-									<span className="sr-only">Messages</span>
-								</Link>
-								<Link href="/notifications" className="relative">
-									<Bell className="h-5 w-5" />
-									<Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0">
-										2
-									</Badge>
-									<span className="sr-only">Notifications</span>
-								</Link>
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Avatar className="cursor-pointer">
-											{/* <AvatarImage src={session.user?.image} /> */}
-											<AvatarFallback>
-												{session.user?.name?.charAt(0) || "U"}
-											</AvatarFallback>
-										</Avatar>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end">
-										<DropdownMenuLabel>My Account</DropdownMenuLabel>
-										<DropdownMenuSeparator />
-										<DropdownMenuItem asChild>
-											<Link href="/dashboard">Dashboard</Link>
-										</DropdownMenuItem>
-										<DropdownMenuItem asChild>
-											<Link href="/profile">Profile</Link>
-										</DropdownMenuItem>
-										<DropdownMenuSeparator />
-										<DropdownMenuItem asChild>
-											<SignOut />
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</>
-						) : (
-							<>
-								<Link
-									href="/login"
-									className="text-sm font-medium hover:text-primary hidden sm:inline-flex"
-								>
-									Log in
-								</Link>
-								<Button asChild size="sm">
-									<Link href="/register">Sign up</Link>
-								</Button>
-							</>
-						)}
-					</div>
-				</div>
-			</header>
+			<Header user={session?.user} />
 
 			<main className="flex-1">
 				{/* Hero Section */}

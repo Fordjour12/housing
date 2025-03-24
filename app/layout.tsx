@@ -1,19 +1,9 @@
+import type React from "react";
+import type { Metadata } from "next";
+import "./globals.css";
+import { NotificationsProvider } from "@/context/notifications-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { cn } from "@/lib/utils";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
 	title: {
@@ -78,16 +68,15 @@ export const metadata: Metadata = {
 	},
 };
 
+// Add the NotificationsProvider to your layout
 export default function RootLayout({
 	children,
-}: {
-	children: React.ReactNode;
-}) {
+}: { children: React.ReactNode }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={cn(geistSans.variable, geistMono.variable)}>
+			<body>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					{children}
+					<NotificationsProvider>{children}</NotificationsProvider>
 					<Toaster />
 				</ThemeProvider>
 			</body>
