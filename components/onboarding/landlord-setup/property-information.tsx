@@ -1,21 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
 	Form,
 	FormControl,
-	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
 	Select,
 	SelectContent,
@@ -23,6 +18,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 // Define the form schema with Zod
 const propertyFormSchema = z.object({
@@ -31,9 +29,12 @@ const propertyFormSchema = z.object({
 	city: z.string().min(1, { message: "City is required" }),
 	state: z.string().min(1, { message: "State/Region is required" }),
 	zip: z.string().min(1, { message: "ZIP/Postal code is required" }),
-	propertyType: z.enum(["Apartment", "House", "Condo", "Townhouse", "Other"], {
-		required_error: "Please select a property type",
-	}),
+	propertyType: z.enum(
+		["single_family", "multi_family", "apartment", "condo", "townhouse"],
+		{
+			required_error: "Please select a property type",
+		},
+	),
 	bedrooms: z.string().min(1, { message: "Number of bedrooms is required" }),
 	bathrooms: z.string().min(1, { message: "Number of bathrooms is required" }),
 	squareFootage: z.string().optional(),
@@ -190,11 +191,13 @@ export default function PropertyInformation({
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										<SelectItem value="Apartment">Apartment</SelectItem>
-										<SelectItem value="House">House</SelectItem>
-										<SelectItem value="Condo">Condo</SelectItem>
-										<SelectItem value="Townhouse">Townhouse</SelectItem>
-										<SelectItem value="Other">Other</SelectItem>
+										<SelectItem value="single_family">
+											Single Family Home
+										</SelectItem>
+										<SelectItem value="multi_family">Multi-Family</SelectItem>
+										<SelectItem value="apartment">Apartment</SelectItem>
+										<SelectItem value="condo">Condo</SelectItem>
+										<SelectItem value="townhouse">Townhouse</SelectItem>
 									</SelectContent>
 								</Select>
 								<FormMessage />

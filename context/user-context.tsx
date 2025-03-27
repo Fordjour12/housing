@@ -12,6 +12,7 @@ import {
 	register as registerAction,
 	userSession,
 } from "@/actions/server/user";
+import { assignRoleToUser } from "@/actions/server/role";
 import { authClient } from "@/lib/auth-client";
 import {
 	type User,
@@ -284,12 +285,29 @@ export function UserProvider({ children }: UserProviderProps) {
 		if (!user) return;
 
 		try {
+			// Make sure to include the role from onboarding state
 			await updateUser({
 				onboardingCompleted: true,
 				...(onboardingState?.profile.name && {
 					name: onboardingState.profile.name,
 				}),
+				// Explicitly set the user's role from onboarding state
+				...(onboardingState?.role && {
+					role: onboardingState.role,
+				}),
 			});
+
+			// If the user selected a role, make sure to call the server action to assign the role
+			if (onboardingState?.role) {
+				// Persist the role assignment to the database
+				const result = await assignRoleToUser(user.id, onboardingState.role);
+				if (!result.success) {
+					console.error(`Failed to assign role: ${result.error}`);
+				} else {
+					console.log(`Role assigned in database: ${onboardingState.role}`);
+				}
+			}
+
 			setOnboardingState(null);
 		} catch (error) {
 			console.error("Failed to complete onboarding:", error);

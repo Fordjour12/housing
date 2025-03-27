@@ -2,14 +2,7 @@
 
 import { db } from "@/lib/database";
 import { eq, and } from "drizzle-orm";
-import {
-	role,
-	user,
-	userRole,
-	type Role,
-	type User,
-	type UserRole,
-} from "@/schema";
+import { role, user, userRole, type Role } from "@/schema";
 import { revalidatePath } from "next/cache";
 
 type RoleWithPermissions = Role;

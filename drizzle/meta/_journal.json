@@ -15,6 +15,13 @@
       "when": 1743027831443,
       "tag": "0001_absent_miek",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1743081126641,
+      "tag": "0002_sleepy_iron_lad",
+      "breakpoints": true
     }
   ]
 }

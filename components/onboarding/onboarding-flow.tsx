@@ -1,11 +1,12 @@
 "use client";
 
-import { useUser } from "@/context/user-context";
-import WelcomeScreen from "./welcome-screen";
-import RoleSelection from "./role-selection";
-import RenterSetup from "./renter-setup";
-import LandlordSetupFlow from "@/components/landlord-setup/landlord-setup-flow";
+import LandlordSetupFlow from "@/components/onboarding/landlord-setup/landlord-setup-flow";
+import PropertyManagerSetupFlow from "@/components/onboarding/property-manager-setup/property-manager-setup-flow";
 import { Card } from "@/components/ui/card";
+import { useUser } from "@/context/user-context";
+import RenterSetup from "./renter-setup";
+import RoleSelection from "./role-selection";
+import WelcomeScreen from "./welcome-screen";
 
 // Mock component for property manager role
 const PropertyManagerSetup = () => (
@@ -39,7 +40,7 @@ export default function OnboardingFlow() {
 				case "landlord":
 					return <LandlordSetupFlow />;
 				case "property_manager":
-					return <PropertyManagerSetup />;
+					return <PropertyManagerSetupFlow />;
 				default:
 					// If no role is selected yet, go back to role selection
 					return <RoleSelection />;

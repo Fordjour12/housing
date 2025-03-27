@@ -18,3 +18,12 @@ export {
     favoriteRelations, type Favorite
 } from "./favorite-schema";
 
+export {
+    propertyAssignment,
+    propertyAssignmentRelations, propertyManagerFirm,
+    propertyManagerFirmRelations,
+    teamMember,
+    teamMemberRelations, type PropertyAssignment, type PropertyManagerFirm,
+    type TeamMember
+} from "./property-manager-schema";
+
