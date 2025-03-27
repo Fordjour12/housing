@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
+import { favorite } from "./favorite-schema";
 
 export const property = pgTable("property", {
 	id: text("id").primaryKey(),
@@ -43,7 +44,7 @@ export const propertyRelations = relations(property, ({ one, many }) => ({
 		fields: [property.ownerId],
 		references: [user.id],
 	}),
-	favorites: many("favorite"),
+	favorites: many(favorite),
 }));
 
 export type Property = typeof property.$inferSelect; 

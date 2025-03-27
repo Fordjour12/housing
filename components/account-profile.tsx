@@ -1159,6 +1159,7 @@ export default function AccountProfile() {
 												{user.subscriptionPlan.features.map(
 													(feature, index) => (
 														<li
+															// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 															key={index}
 															className="text-sm flex items-center"
 														>

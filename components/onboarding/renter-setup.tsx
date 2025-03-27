@@ -32,13 +32,28 @@ import {
 } from "lucide-react";
 
 // Define more specific types for our form data
-type FormDataValue =
-	| string
-	| number
-	| boolean
-	| string[]
-	| number[]
-	| { [key: string]: any };
+interface FormData {
+	name: string;
+	phone: string;
+	occupation: string;
+	moveInDate: string;
+	budget: {
+		min: number;
+		max: number;
+	};
+	bedrooms: number[];
+	propertyTypes: string[];
+	amenities: string[];
+	petFriendly: boolean;
+	notifications: {
+		email: boolean;
+		push: boolean;
+		newListings: boolean;
+		applicationUpdates: boolean;
+	};
+}
+
+type FormDataKey = keyof FormData;
 
 export default function RenterSetup() {
 	const { onboardingState, updateOnboardingState, completeOnboarding } =
@@ -47,31 +62,40 @@ export default function RenterSetup() {
 	const preferences = onboardingState?.preferences || {};
 
 	const [step, setStep] = useState(1);
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = useState<FormData>({
 		// Profile
-		name: profile.name || "",
-		phone: profile.phone || "",
-		occupation: profile.occupation || "",
-		moveInDate: profile.moveInDate || "",
+		name: (profile.name as string) || "",
+		phone: (profile.phone as string) || "",
+		occupation: (profile.occupation as string) || "",
+		moveInDate: (profile.moveInDate as string) || "",
 
 		// Preferences
 		budget: {
-			min: preferences.budgetMin || 500,
-			max: preferences.budgetMax || 2500,
+			min: Number(preferences.budgetMin) || 500,
+			max: Number(preferences.budgetMax) || 2500,
 		},
-		bedrooms: preferences.bedrooms || [],
-		propertyTypes: preferences.propertyTypes || [],
-		amenities: preferences.amenities || [],
-		petFriendly: preferences.petFriendly || false,
+		bedrooms: Array.isArray(preferences.bedrooms)
+			? (preferences.bedrooms as number[])
+			: [],
+		propertyTypes: Array.isArray(preferences.propertyTypes)
+			? (preferences.propertyTypes as string[])
+			: [],
+		amenities: Array.isArray(preferences.amenities)
+			? (preferences.amenities as string[])
+			: [],
+		petFriendly: Boolean(preferences.petFriendly) || false,
 		notifications: {
 			email: preferences.emailNotifications !== false,
-			push: preferences.pushNotifications || false,
+			push: Boolean(preferences.pushNotifications) || false,
 			newListings: preferences.newListingNotifications !== false,
 			applicationUpdates: preferences.applicationUpdates !== false,
 		},
 	});
 
-	const handleInputChange = (field: string, value: FormDataValue) => {
+	const handleInputChange = <K extends FormDataKey>(
+		field: K,
+		value: FormData[K],
+	) => {
 		setFormData({
 			...formData,
 			[field]: value,
@@ -116,9 +140,11 @@ export default function RenterSetup() {
 			applicationUpdates: formData.notifications.applicationUpdates,
 		};
 
+		// Make sure to keep the role that was selected in the previous step
 		await updateOnboardingState({
 			profile: updatedProfile,
 			preferences: updatedPreferences,
+			role: onboardingState?.role, // Preserve the role from previous onboarding step
 		});
 
 		await completeOnboarding();
@@ -237,7 +263,7 @@ export default function RenterSetup() {
 								<div className="flex items-center space-x-4">
 									<div>
 										<Label className="text-sm text-muted-foreground">
-											Min: ${formData.budget.min}
+											Min: ${formData.budget.min.toString()}
 										</Label>
 									</div>
 									<Slider
@@ -255,7 +281,7 @@ export default function RenterSetup() {
 									/>
 									<div>
 										<Label className="text-sm text-muted-foreground">
-											Max: ${formData.budget.max}
+											Max: ${formData.budget.max.toString()}
 										</Label>
 									</div>
 								</div>
@@ -274,7 +300,7 @@ export default function RenterSetup() {
 											className="h-10 px-3"
 											onClick={() => {
 												const newBedrooms = formData.bedrooms.includes(num)
-													? formData.bedrooms.filter((b: number) => b !== num)
+													? formData.bedrooms.filter((b) => b !== num)
 													: [...formData.bedrooms, num];
 												handleInputChange("bedrooms", newBedrooms);
 											}}
@@ -302,9 +328,7 @@ export default function RenterSetup() {
 											className="h-10"
 											onClick={() => {
 												const newTypes = formData.propertyTypes.includes(type)
-													? formData.propertyTypes.filter(
-															(t: string) => t !== type,
-														)
+													? formData.propertyTypes.filter((t) => t !== type)
 													: [...formData.propertyTypes, type];
 												handleInputChange("propertyTypes", newTypes);
 											}}

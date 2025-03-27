@@ -12,6 +12,66 @@ export interface User {
 	lastLogin: string;
 }
 
+// Define property manager setup preference structure
+export interface PropertyManagerSetupPreference {
+	firm: {
+		businessName: string;
+		streetAddress: string;
+		unitNumber?: string;
+		city: string;
+		state: string;
+		zip: string;
+		phoneNumber: string;
+		website?: string;
+		propertiesCount?: "1-10" | "11-50" | "51-100" | "100+";
+	};
+	management: {
+		defaultContactEmail: string;
+		defaultContactPhone: string;
+		notifyNewInquiries: boolean;
+		notifyMaintenanceRequests: boolean;
+		notifyRentReminders: boolean;
+		notifyLeaseExpirations: boolean;
+		applicationProcess: "internal" | "platform";
+		screeningCreditCheck: boolean;
+		screeningBackgroundCheck: boolean;
+		screeningIncomeVerification: boolean;
+		leaseSigningPreference: "digital" | "offline";
+	};
+	team: {
+		teamMembers?: Array<{
+			email: string;
+			role: "administrator" | "property_manager" | "leasing_agent" | "maintenance_technician";
+		}>;
+	};
+	property?: {
+		streetAddress?: string;
+		unitNumber?: string;
+		city?: string;
+		state?: string;
+		zip?: string;
+		propertyType?: "single_family" | "multi_family" | "apartment" | "condo" | "townhouse";
+		bedrooms?: string;
+		bathrooms?: string;
+		squareFootage?: string;
+		yearBuilt?: string;
+		propertyManagerId?: string;
+		leaseTemplateId?: string;
+	};
+	rental?: {
+		rentAmount?: string;
+		securityDeposit?: string;
+		leaseDurations?: Array<"month-to-month" | "6-months" | "1-year" | "other">;
+		availabilityDate?: Date;
+		description?: string;
+		amenities?: Array<"laundry" | "parking" | "pet-friendly" | "ac" | "dishwasher" | "balcony" | "pool" | "gym" | "elevator" | "wheelchair">;
+		petPolicy?: "no-pets" | "cats-only" | "dogs-only" | "cats-and-dogs" | "case-by-case";
+		petRestrictions?: string;
+		utilitiesIncluded?: Array<"water" | "electricity" | "gas" | "trash" | "internet">;
+	};
+	photos?: string[];
+}
+
 // Define more specific preference value types
 export type PreferenceValue =
 	| string
@@ -52,7 +112,8 @@ export type PreferenceValue =
 				leaseSigningPreference?: "online" | "in-person" | "both";
 			};
 			photos: string[];
-	  };
+	  }
+	| PropertyManagerSetupPreference;
 
 export interface OnboardingState {
 	step: number;

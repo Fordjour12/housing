@@ -10,6 +10,45 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+// Import or define the required types
+interface PropertyData {
+	streetAddress?: string;
+	unitNumber?: string;
+	city?: string;
+	state?: string;
+	zip?: string;
+	propertyType?:
+		| "single_family"
+		| "multi_family"
+		| "apartment"
+		| "condo"
+		| "townhouse";
+	bedrooms?: string;
+	bathrooms?: string;
+	squareFootage?: string;
+	yearBuilt?: string;
+}
+
+interface RentalData {
+	rentAmount: string;
+	securityDeposit: string;
+	leaseDurations: string[];
+	availabilityDate: Date;
+	description?: string;
+	amenities: string[];
+	petPolicy: string;
+	petRestrictions?: string;
+	utilitiesIncluded: string[];
+}
+
+interface ManagementData {
+	contactDisplay: "phone_and_email" | "email_only";
+	applicationProcess: "self_managed" | "app_managed";
+	screeningPreferences: string[];
+	communicationPreferences: string[];
+	leaseSigningPreference: "digital" | "offline";
+}
+
 interface ListingConfirmationProps {
 	onNext: (data: { photos: string[] }) => void;
 	onBack: () => void;
@@ -68,8 +107,36 @@ export default function ListingConfirmation({
 		setIsPublishing(true);
 
 		try {
+			// Make sure required fields exist
+			if (
+				!formData.property.streetAddress ||
+				!formData.property.city ||
+				!formData.property.state ||
+				!formData.property.zip ||
+				!formData.property.propertyType ||
+				!formData.property.bedrooms ||
+				!formData.property.bathrooms
+			) {
+				toast.error("Missing required property information");
+				setIsPublishing(false);
+				return;
+			}
+
+			const propertyData = {
+				streetAddress: formData.property.streetAddress,
+				unitNumber: formData.property.unitNumber,
+				city: formData.property.city,
+				state: formData.property.state,
+				zip: formData.property.zip,
+				propertyType: formData.property.propertyType,
+				bedrooms: formData.property.bedrooms,
+				bathrooms: formData.property.bathrooms,
+				squareFootage: formData.property.squareFootage,
+				yearBuilt: formData.property.yearBuilt,
+			};
+
 			const result = await createProperty({
-				property: formData.property,
+				property: propertyData,
 				rental: formData.rental,
 				management: formData.management,
 				photos,
@@ -77,7 +144,14 @@ export default function ListingConfirmation({
 
 			if (result.success) {
 				toast.success("Property listing published successfully!");
-				router.push(`/landlord/listings/${result.data.id}`);
+				onNext({ photos }); // Ensure we pass the photos back
+
+				// Safe navigation for result.data
+				if (result.data?.id) {
+					router.push(`/landlord/listings/${result.data.id}`);
+				} else {
+					router.push("/landlord/listings");
+				}
 			} else {
 				toast.error(result.error || "Failed to publish listing");
 			}
@@ -94,8 +168,36 @@ export default function ListingConfirmation({
 		setIsDraftSaving(true);
 
 		try {
+			// Make sure required fields exist
+			if (
+				!formData.property.streetAddress ||
+				!formData.property.city ||
+				!formData.property.state ||
+				!formData.property.zip ||
+				!formData.property.propertyType ||
+				!formData.property.bedrooms ||
+				!formData.property.bathrooms
+			) {
+				toast.error("Missing required property information");
+				setIsDraftSaving(false);
+				return;
+			}
+
+			const propertyData = {
+				streetAddress: formData.property.streetAddress,
+				unitNumber: formData.property.unitNumber,
+				city: formData.property.city,
+				state: formData.property.state,
+				zip: formData.property.zip,
+				propertyType: formData.property.propertyType,
+				bedrooms: formData.property.bedrooms,
+				bathrooms: formData.property.bathrooms,
+				squareFootage: formData.property.squareFootage,
+				yearBuilt: formData.property.yearBuilt,
+			};
+
 			const result = await createProperty({
-				property: formData.property,
+				property: propertyData,
 				rental: formData.rental,
 				management: formData.management,
 				photos,
@@ -103,6 +205,7 @@ export default function ListingConfirmation({
 
 			if (result.success) {
 				toast.success("Property listing saved as draft!");
+				onNext({ photos }); // Ensure we pass the photos back
 				router.push("/landlord/listings");
 			} else {
 				toast.error(result.error || "Failed to save draft");
@@ -142,6 +245,28 @@ export default function ListingConfirmation({
 			wheelchair: "Wheelchair Access",
 		};
 		return amenityMap[id] || id;
+	};
+
+	// Format pet policy
+	const formatPetPolicy = (policy: string) => {
+		const policyMap: Record<string, string> = {
+			"no-pets": "No Pets Allowed",
+			"cats-only": "Cats Only",
+			"dogs-only": "Dogs Only",
+			"cats-and-dogs": "Cats and Dogs Allowed",
+			"case-by-case": "Case-by-Case Basis",
+		};
+		return policyMap[policy] || policy;
+	};
+
+	// Map screening preferences to display text
+	const getScreeningText = (pref: string) => {
+		const prefMap: Record<string, string> = {
+			credit_check: "Credit Check",
+			background_check: "Background Check",
+			income_verification: "Income Verification",
+		};
+		return prefMap[pref] || pref;
 	};
 
 	return (
@@ -263,13 +388,8 @@ export default function ListingConfirmation({
 						<div>
 							<span className="font-medium">Pet Policy: </span>
 							<span>
-								{formData.rental.petPolicy === "allowed"
-									? "Pets Allowed"
-									: formData.rental.petPolicy === "not-allowed"
-										? "No Pets Allowed"
-										: "Case-by-Case Basis"}
-								{formData.rental.petPolicy === "case-by-case" &&
-									formData.rental.petRestrictions &&
+								{formatPetPolicy(formData.rental.petPolicy)}
+								{formData.rental.petRestrictions &&
 									` (${formData.rental.petRestrictions})`}
 							</span>
 						</div>
@@ -317,18 +437,7 @@ export default function ListingConfirmation({
 									<span className="font-medium">Screening Preferences: </span>
 									<span>
 										{formData.management.screeningPreferences
-											.map((pref: string) => {
-												switch (pref) {
-													case "credit_check":
-														return "Credit Check";
-													case "background_check":
-														return "Background Check";
-													case "income_verification":
-														return "Income Verification";
-													default:
-														return pref;
-												}
-											})
+											.map((pref: string) => getScreeningText(pref))
 											.join(", ")}
 									</span>
 								</div>
@@ -351,7 +460,10 @@ export default function ListingConfirmation({
 				<h3 className="text-lg font-semibold mb-2">Property Photos</h3>
 				<div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
 					{photos.map((photo, index) => (
-						<div key={`property-view-${photo}-${index}`} className="relative">
+						<div
+							key={`photo-${index}-${photo.substring(0, 10)}`}
+							className="relative"
+						>
 							<img
 								src={photo}
 								alt={`View ${index + 1} of the property`}
@@ -429,6 +541,13 @@ export default function ListingConfirmation({
 						) : (
 							"Publish Listing"
 						)}
+					</Button>
+					<Button
+						type="button"
+						onClick={() => onNext({ photos })}
+						disabled={isDraftSaving || isPublishing}
+					>
+						Continue
 					</Button>
 				</div>
 			</div>
