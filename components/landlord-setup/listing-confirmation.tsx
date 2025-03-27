@@ -1,20 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { createProperty } from "@/actions/server/property";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { UploadIcon, Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Loader2, UploadIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface ListingConfirmationProps {
 	onNext: (data: { photos: string[] }) => void;
 	onBack: () => void;
 	formData: {
-		property: any;
-		rental: any;
-		management: any;
+		property: PropertyData;
+		rental: RentalData;
+		management: ManagementData;
 		photos: string[];
 	};
 }
@@ -28,6 +30,7 @@ export default function ListingConfirmation({
 	const [isUploading, setIsUploading] = useState(false);
 	const [isDraftSaving, setIsDraftSaving] = useState(false);
 	const [isPublishing, setIsPublishing] = useState(false);
+	const router = useRouter();
 
 	// Handle photo upload
 	const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,27 +64,55 @@ export default function ListingConfirmation({
 	};
 
 	// Handle form submission
-	const handlePublish = () => {
+	const handlePublish = async () => {
 		setIsPublishing(true);
 
-		// Simulate API call
-		setTimeout(() => {
-			onNext({ photos });
+		try {
+			const result = await createProperty({
+				property: formData.property,
+				rental: formData.rental,
+				management: formData.management,
+				photos,
+			});
+
+			if (result.success) {
+				toast.success("Property listing published successfully!");
+				router.push(`/landlord/listings/${result.data.id}`);
+			} else {
+				toast.error(result.error || "Failed to publish listing");
+			}
+		} catch (error) {
+			console.error("Error publishing listing:", error);
+			toast.error("Failed to publish listing");
+		} finally {
 			setIsPublishing(false);
-		}, 1500);
+		}
 	};
 
 	// Handle saving as draft
-	const handleSaveAsDraft = () => {
+	const handleSaveAsDraft = async () => {
 		setIsDraftSaving(true);
 
-		// Simulate API call
-		setTimeout(() => {
-			// Instead of proceeding to the next step, you might redirect elsewhere
-			// or show a different UI, but for demo we'll just move forward
-			onNext({ photos });
+		try {
+			const result = await createProperty({
+				property: formData.property,
+				rental: formData.rental,
+				management: formData.management,
+				photos,
+			});
+
+			if (result.success) {
+				toast.success("Property listing saved as draft!");
+				router.push("/landlord/listings");
+			} else {
+				toast.error(result.error || "Failed to save draft");
+			}
+		} catch (error) {
+			console.error("Error saving draft:", error);
+			toast.error("Failed to save draft");
+		} finally {
 			setIsDraftSaving(false);
-		}, 1000);
+		}
 	};
 
 	// Format utility names
@@ -318,70 +349,49 @@ export default function ListingConfirmation({
 			{/* Photo Upload Section */}
 			<div className="mb-6">
 				<h3 className="text-lg font-semibold mb-2">Property Photos</h3>
-				<p className="text-sm text-gray-500 mb-4">
-					High-quality photos significantly increase interest in your listing.
-					Upload at least 3 photos.
-				</p>
-
-				{/* Photo upload button */}
-				<div className="mb-4">
-					<Input
-						id="photo-upload"
-						type="file"
-						multiple
-						accept="image/*"
-						className="hidden"
-						onChange={handlePhotoUpload}
-						disabled={isUploading}
-					/>
-					<label
-						htmlFor="photo-upload"
-						className="cursor-pointer inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90"
-					>
-						{isUploading ? (
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								Uploading...
-							</>
-						) : (
-							<>
-								<UploadIcon className="mr-2 h-4 w-4" />
-								Upload Photos
-							</>
-						)}
-					</label>
-				</div>
-
-				{/* Photo preview */}
-				<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+				<div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
 					{photos.map((photo, index) => (
-						<div key={index} className="relative group">
+						<div key={`property-view-${photo}-${index}`} className="relative">
 							<img
 								src={photo}
-								alt={`Property photo ${index + 1}`}
-								className="w-full h-24 object-cover rounded-md"
+								alt={`View ${index + 1} of the property`}
+								className="w-full h-32 object-cover rounded-md"
+								loading="lazy"
 							/>
 							<button
+								type="button"
 								onClick={() => removePhoto(index)}
-								className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+								className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+								aria-label={`Remove view ${index + 1}`}
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									className="h-4 w-4"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M6 18L18 6M6 6l12 12"
-									/>
-								</svg>
+								<span className="sr-only">Remove view {index + 1}</span>×
 							</button>
 						</div>
 					))}
+				</div>
+				<div className="flex items-center gap-4">
+					<label
+						htmlFor="photo-upload"
+						className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200"
+					>
+						<UploadIcon className="w-5 h-5" />
+						<span>Upload Photos</span>
+						<input
+							id="photo-upload"
+							type="file"
+							accept="image/*"
+							multiple
+							onChange={handlePhotoUpload}
+							className="hidden"
+							aria-label="Upload property photos"
+						/>
+					</label>
+					{isUploading && (
+						<div className="flex items-center gap-2 text-gray-500">
+							<Loader2 className="w-5 h-5 animate-spin" />
+							<span>Uploading...</span>
+						</div>
+					)}
 				</div>
 			</div>
 

@@ -1,7 +1,7 @@
 ---
-description: Best practices for using Drizzle ORM with your database
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 
 - Use type-safe queries with Drizzle's TypeScript integration
