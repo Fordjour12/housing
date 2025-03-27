@@ -15,15 +15,16 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
-import { login } from "@/actions/server/user";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useUser } from "@/context/user-context";
+import { toast } from "sonner";
 
 export default function LoginForm() {
 	const [isLoading, setIsLoading] = useState(false);
+	const { login } = useUser();
 	const form = useForm<z.infer<LoginSchema>>({
 		resolver: zodResolver(loginSchema),
 		resetOptions: {
@@ -40,12 +41,14 @@ export default function LoginForm() {
 	async function onSubmit(values: z.infer<LoginSchema>) {
 		try {
 			setIsLoading(true);
-			await login(values.email, values.password);
-			toast.success("Login successful");
-			router.push("/listings");
+			const result = await login(values.email, values.password);
 
-			// Do something with the form values.
-			// ✅ This will be type-safe and validated.
+			if (result.success) {
+				toast.success("Login successful");
+				router.push("/listings");
+			} else {
+				toast.error(result.error || "Failed to login. Please try again.");
+			}
 		} catch (error) {
 			console.error("Login error:", error);
 			toast.error("Failed to login. Please try again.");

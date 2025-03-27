@@ -11,3 +11,12 @@ export {
 	sessionRelations,
 	accountRelations,
 } from "./auth-schema";
+
+export {
+	type Role,
+	type UserRole,
+	role,
+	userRole,
+	roleRelations,
+	userRoleRelations,
+} from "./role-schema";

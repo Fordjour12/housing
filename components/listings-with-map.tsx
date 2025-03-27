@@ -25,7 +25,7 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import AdvancedSearch from "@/components/advanced-search";
-import type { SearchCriteria, SavedSearch } from "@/app/types/search";
+import type { SearchCriteria, SavedSearch } from "@/types/search";
 import { saveSearch } from "@/app/services/saved-searches";
 
 // Sample data for listings

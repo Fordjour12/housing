@@ -3,8 +3,64 @@ description:
 globs: 
 alwaysApply: true
 ---
+# Tailwind CSS v4 Rules File for LLM Optimization
+ Use utility-first classes for styling components. Utilize Tailwind's responsive utilities for mobile-first design
 
-- Use utility-first classes for styling components
-- Create custom components with `@apply` directive for reusability
-- Utilize Tailwind's responsive utilities for mobile-first design
-- Implement dark mode support using Tailwind's dark mode classes
+## General Rules
+
+1. **Use CSS-First Configuration:**
+   - Tailwind v4 eliminates the need for `tailwind.config.js` by allowing configuration directly in CSS using `@theme`.
+   
+2. **Enforce Performance Optimization:**
+   - Avoid unnecessary class duplication.
+   - Utilize `@layer` for grouping styles efficiently.
+   
+3. **Maintain Readability and Reusability:**
+   - Use semantic class names where applicable.
+   - Define reusable styles with CSS variables inside `@theme`.
+
+
+### CSS-First Theme Configuration
+```css
+@theme {
+  --color-primary: oklch(0.7 0.28 145);
+  --font-display: "Inter", sans-serif;
+  --breakpoint-lg: 1024px;
+}
+```
+
+### Extending with `@layer`
+```css
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+```
+
+## Performance Guidelines
+
+1. **Use Utility Classes Efficiently:**
+   - Avoid deeply nested elements that require excessive utility classes.
+   - Keep class lists short and modular.
+
+2. **Leverage Tailwind's JIT Engine:**
+   - Remove unused CSS classes to reduce file size.
+   - Use dynamic class generation efficiently.
+
+3. **Minimize Redundant Styles:**
+   - Define global styles in `@theme` to reduce repetition.
+
+## Best Practices for Component Development
+  **Avoid Unnecessary Custom Styles:**
+   - Stick to Tailwind’s utility classes as much as possible.
+   - Use `@apply` sparingly to maintain clarity.
+
+## Resources for Further Optimization
+
+- [Official Documentation](mdc:https:/tailwindcss.com/docs)
+- [Tailwind CSS v4 Release Blog](mdc:https:/tailwindcss.com/blog/tailwindcss-v4)
+
+These rules ensure efficient and optimal usage of Tailwind CSS v4, reducing unnecessary processing for LLMs while maintaining clarity and performance.
+
+Always follow the color schema in the [globals.css](mdc:app/globals.css) file only add new colors when there is the absoulte need to add that color.
