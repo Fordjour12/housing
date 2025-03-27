@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Card } from "@/components/ui/card";
 import { useUser } from "@/context/user-context";
+import { useState } from "react";
+import ListingConfirmation from "./listing-confirmation";
+import ManagementPreferences from "./management-preferences";
 import PropertyInformation from "./property-information";
 import RentalDetails from "./rental-details";
-import ManagementPreferences from "./management-preferences";
-import ListingConfirmation from "./listing-confirmation";
-import { Card } from "@/components/ui/card";
-import { z } from "zod";
 
 // Define types for form data
 interface PropertyData {
@@ -16,34 +15,60 @@ interface PropertyData {
 	city?: string;
 	state?: string;
 	zip?: string;
-	propertyType?: string;
+	propertyType?:
+		| "single_family"
+		| "multi_family"
+		| "apartment"
+		| "condo"
+		| "townhouse";
 	bedrooms?: string;
 	bathrooms?: string;
 	squareFootage?: string;
 	yearBuilt?: string;
-	[key: string]: any;
 }
 
 interface RentalData {
 	rentAmount?: string;
 	securityDeposit?: string;
-	leaseDurations?: string[];
+	leaseDurations?: Array<"month-to-month" | "6-months" | "1-year" | "other">;
 	availabilityDate?: Date;
 	description?: string;
-	amenities?: string[];
-	petPolicy?: string;
+	amenities?: Array<
+		| "laundry"
+		| "parking"
+		| "pet-friendly"
+		| "ac"
+		| "dishwasher"
+		| "balcony"
+		| "pool"
+		| "gym"
+		| "elevator"
+		| "wheelchair"
+	>;
+	petPolicy?:
+		| "no-pets"
+		| "cats-only"
+		| "dogs-only"
+		| "cats-and-dogs"
+		| "case-by-case";
 	petRestrictions?: string;
-	utilitiesIncluded?: string[];
-	[key: string]: any;
+	utilitiesIncluded?: Array<
+		"water" | "electricity" | "gas" | "trash" | "internet"
+	>;
 }
 
 interface ManagementData {
-	contactDisplay?: string;
-	applicationProcess?: string;
-	screeningPreferences?: string[];
-	communicationPreferences?: string[];
-	leaseSigningPreference?: string;
-	[key: string]: any;
+	contactDisplay?: "email" | "phone" | "both";
+	applicationProcess?: "online" | "in-person" | "both";
+	screeningPreferences?: Array<
+		| "credit-check"
+		| "background-check"
+		| "income-verification"
+		| "rental-history"
+		| "references"
+	>;
+	communicationPreferences?: Array<"email" | "phone" | "text" | "in-person">;
+	leaseSigningPreference?: "online" | "in-person" | "both";
 }
 
 interface FormData {

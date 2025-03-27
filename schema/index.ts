@@ -1,22 +1,20 @@
 export {
-	type User,
-	type Account,
-	type Session,
-	type Verification,
-	account,
-	session,
-	user,
-	verification,
-	userRelations,
-	sessionRelations,
-	accountRelations,
+    account, accountRelations, session, sessionRelations, user, userRelations, verification, type Account,
+    type Session, type User, type Verification
 } from "./auth-schema";
 
 export {
-	type Role,
-	type UserRole,
-	role,
-	userRole,
-	roleRelations,
-	userRoleRelations,
+    role, roleRelations, userRole, userRoleRelations, type Role,
+    type UserRole
 } from "./role-schema";
+
+export {
+    property,
+    propertyRelations, type Property
+} from "./property-schema";
+
+export {
+    favorite,
+    favoriteRelations, type Favorite
+} from "./favorite-schema";
+

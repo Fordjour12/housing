@@ -19,7 +19,40 @@ export type PreferenceValue =
 	| boolean
 	| string[]
 	| number[]
-	| { [key: string]: string | number | boolean };
+	| { [key: string]: string | number | boolean | string[] | Date }
+	| {
+			property: {
+				streetAddress?: string;
+				unitNumber?: string;
+				city?: string;
+				state?: string;
+				zip?: string;
+				propertyType?: "single_family" | "multi_family" | "apartment" | "condo" | "townhouse";
+				bedrooms?: string;
+				bathrooms?: string;
+				squareFootage?: string;
+				yearBuilt?: string;
+			};
+			rental: {
+				rentAmount?: string;
+				securityDeposit?: string;
+				leaseDurations?: Array<"month-to-month" | "6-months" | "1-year" | "other">;
+				availabilityDate?: Date;
+				description?: string;
+				amenities?: Array<"laundry" | "parking" | "pet-friendly" | "ac" | "dishwasher" | "balcony" | "pool" | "gym" | "elevator" | "wheelchair">;
+				petPolicy?: "no-pets" | "cats-only" | "dogs-only" | "cats-and-dogs" | "case-by-case";
+				petRestrictions?: string;
+				utilitiesIncluded?: Array<"water" | "electricity" | "gas" | "trash" | "internet">;
+			};
+			management: {
+				contactDisplay?: "email" | "phone" | "both";
+				applicationProcess?: "online" | "in-person" | "both";
+				screeningPreferences?: Array<"credit-check" | "background-check" | "income-verification" | "rental-history" | "references">;
+				communicationPreferences?: Array<"email" | "phone" | "text" | "in-person">;
+				leaseSigningPreference?: "online" | "in-person" | "both";
+			};
+			photos: string[];
+	  };
 
 export interface OnboardingState {
 	step: number;

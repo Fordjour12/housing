@@ -1,11 +1,10 @@
+import { relations } from "drizzle-orm";
 import {
+	boolean,
 	pgTable,
 	text,
-	integer,
-	timestamp,
-	boolean,
+	timestamp
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
 import { role, userRole } from "./role-schema";
 
 export const user = pgTable("user", {
@@ -29,8 +28,6 @@ export const userRelations = relations(user, ({ many, one }) => ({
 		fields: [user.role],
 		references: [role.id],
 	}),
-	// properties: many(property),
-	// favorites: many(favorite),
 }));
 
 export const session = pgTable("session", {
@@ -87,58 +84,10 @@ export const verification = pgTable("verification", {
 	updatedAt: timestamp("updated_at"),
 });
 
-// export const property = pgTable("property", {
-// 	id: text("id").primaryKey(),
-// 	title: text("title").notNull(),
-// 	description: text("description"),
-// 	address: text("address").notNull(),
-// 	price: integer("price").notNull(),
-// 	bedrooms: integer("bedrooms"),
-// 	bathrooms: integer("bathrooms"),
-// 	squareFeet: integer("square_feet"),
-// 	isAvailable: boolean("is_available").notNull().default(true),
-// 	ownerId: text("owner_id")
-// 		.notNull()
-// 		.references(() => user.id, { onDelete: "cascade" }),
-// 	createdAt: timestamp("created_at").notNull().defaultNow(),
-// 	updatedAt: timestamp("updated_at").notNull().defaultNow(),
-// });
-
-// export const propertyRelations = relations(property, ({ one, many }) => ({
-// 	owner: one(user, {
-// 		fields: [property.ownerId],
-// 		references: [user.id],
-// 	}),
-// 	favorites: many(favorite),
-// }));
-
-// export const favorite = pgTable("favorite", {
-// 	id: text("id").primaryKey(),
-// 	userId: text("user_id")
-// 		.notNull()
-// 		.references(() => user.id, { onDelete: "cascade" }),
-// 	propertyId: text("property_id")
-// 		.notNull()
-// 		.references(() => property.id, { onDelete: "cascade" }),
-// 	createdAt: timestamp("created_at").notNull().defaultNow(),
-// });
-
-// export const favoriteRelations = relations(favorite, ({ one }) => ({
-// 	user: one(user, {
-// 		fields: [favorite.userId],
-// 		references: [user.id],
-// 	}),
-// 	property: one(property, {
-// 		fields: [favorite.propertyId],
-// 		references: [property.id],
-// 	}),
-// }));
-
 type User = typeof user.$inferSelect;
 type Session = typeof session.$inferSelect;
 type Account = typeof account.$inferSelect;
 type Verification = typeof verification.$inferSelect;
-// type Property = typeof property.$inferSelect;
-// type Favorite = typeof favorite.$inferSelect;
 
-export type { User, Session, Account, Verification };
+export type { Account, Session, User, Verification };
+
