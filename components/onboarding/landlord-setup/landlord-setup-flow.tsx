@@ -1,14 +1,14 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useUser } from "@/context/user-context";
+import type { PreferenceValue } from "@/types/user";
 import { useState } from "react";
 import ListingConfirmation from "./listing-confirmation";
 import ManagementPreferences from "./management-preferences";
 import PropertyInformation from "./property-information";
 import RentalDetails from "./rental-details";
-import { Button } from "@/components/ui/button";
-import type { PreferenceValue } from "@/types/user";
 
 // Define types for form data
 interface PropertyData {
@@ -172,7 +172,12 @@ export default function LandlordSetupFlow() {
 		});
 
 		// Complete the onboarding process
+		// This will update the database as the source of truth for onboarding status
 		await completeOnboarding();
+
+		// Redirect to listings page
+		// The database is now the source of truth for onboarding status
+		window.location.href = "/listings";
 	};
 
 	// Standard bottom navigation component

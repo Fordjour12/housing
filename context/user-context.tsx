@@ -1,26 +1,27 @@
 "use client";
 
+import { assignRoleToUser } from "@/actions/server/role";
 import {
-	createContext,
-	useContext,
-	useState,
-	useEffect,
-	type ReactNode,
-} from "react";
-import {
+	getUserProfile,
 	login as loginAction,
 	register as registerAction,
+	updateOnboardingStatus,
 	userSession,
 } from "@/actions/server/user";
-import { assignRoleToUser } from "@/actions/server/role";
 import { authClient } from "@/lib/auth-client";
 import {
-	type User,
-	UserRole,
-	type RolePermission,
 	DEFAULT_ROLE_PERMISSIONS,
 	type OnboardingState,
+	type RolePermission,
+	type User,
 } from "@/types/user";
+import {
+	type ReactNode,
+	createContext,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
 
 // Add types for the auth session data
 interface AuthUser {
@@ -33,11 +34,33 @@ interface AuthUser {
 	updatedAt: Date;
 }
 
+// Enhanced user adds database fields
+interface EnhancedUser extends AuthUser {
+	role?: User["role"];
+	onboardingCompleted?: boolean;
+}
+
 interface AuthSession {
 	user: AuthUser;
 	expires: string;
 	// Sometimes custom data may be attached to the session
 	[key: string]: unknown;
+}
+
+// Added type for the enhanced session structure returned by userSession()
+interface EnhancedSessionData {
+	session: AuthSession;
+	user: {
+		id: string;
+		email: string;
+		name: string | null;
+		emailVerified: boolean | null;
+		image?: string | null;
+		createdAt: Date;
+		updatedAt: Date;
+		role?: User["role"];
+		onboardingCompleted?: boolean;
+	};
 }
 
 interface UserContextType {
@@ -121,18 +144,53 @@ export function UserProvider({ children }: UserProviderProps) {
 				const session = await userSession();
 
 				if (session.data?.session) {
-					console.log(session);
-					// Create our User object from the auth session
+					console.log("Session data:", session.data);
+					// Cast to our enhanced session type for type safety - first to unknown, then to EnhancedSessionData
+					const enhancedData = session.data as unknown as EnhancedSessionData;
+
+					// Create our User object from the auth session with proper onboarding status
 					const userData: User = {
-						id: session.data.user.id,
-						email: session.data.user.email,
-						name: session.data.user.name || "",
-						// Role would need to be stored somewhere - for now setting a default or undefined
-						role: undefined,
-						onboardingCompleted: false, // Default to false, would need to be stored elsewhere
-						profilePicture: session.data.user.image || undefined,
-						createdAt: session.data.user.createdAt.toISOString(),
+						id: enhancedData.user.id,
+						email: enhancedData.user.email,
+						name: enhancedData.user.name || "",
+						// Use the role and onboarding status from the enhanced session
+						// which comes from the database (source of truth)
+						role: enhancedData.user.role as User["role"],
+						onboardingCompleted: enhancedData.user.onboardingCompleted ?? false,
+						profilePicture: enhancedData.user.image || undefined,
+						createdAt: enhancedData.user.createdAt.toISOString(),
 						lastLogin: new Date().toISOString(),
+						// Add default values for profile fields
+						phone: "",
+						bio: "",
+						address: "",
+						avatar:
+							enhancedData.user.image ||
+							"/placeholder.svg?height=200&width=200",
+						memberSince: new Date(enhancedData.user.createdAt)
+							.toISOString()
+							.split("T")[0],
+						verifications: {
+							email: true,
+							phone: false,
+							identity: false,
+						},
+						preferences: {
+							emailNotifications: {
+								newListings: true,
+								applicationUpdates: true,
+								messageAlerts: true,
+								promotions: false,
+							},
+							pushNotifications: {
+								newListings: false,
+								applicationUpdates: true,
+								messageAlerts: true,
+								promotions: false,
+							},
+						},
+						savedSearches: [],
+						favoriteListings: [],
 					};
 
 					setUser(userData);
@@ -154,29 +212,69 @@ export function UserProvider({ children }: UserProviderProps) {
 			const result = await loginAction(email, password);
 
 			if (result.success && result.data?.user) {
-				// For now, we'll consider all logins as "new" users who need onboarding
-				// In a real app, you'd store this information in a database
-				const isNewUser = true;
+				// Get the user's complete profile from the database to get accurate onboarding status
+				const userProfileResult = await getUserProfile(result.data.user.id);
+
+				// Use onboarding status from database - this is our source of truth
+				const onboardingCompleted = userProfileResult.success
+					? (userProfileResult.data?.onboardingCompleted ?? false)
+					: false;
+
+				// Use role from database - this is our source of truth
+				const userRole = userProfileResult.success
+					? userProfileResult.data?.role
+					: undefined;
 
 				// Create our User object from the auth session
 				const userData: User = {
 					id: result.data.user.id,
 					email: result.data.user.email,
 					name: result.data.user.name || "",
-					role: undefined, // Role would need to be set during onboarding
-					onboardingCompleted: !isNewUser,
+					role: userRole as User["role"], // Type assertion to fix type error
+					onboardingCompleted: onboardingCompleted, // Onboarding status from database
 					profilePicture: result.data.user.image || undefined,
 					createdAt: result.data.user.createdAt.toISOString(),
 					lastLogin: new Date().toISOString(),
+					// Add default values for profile fields
+					phone: "",
+					bio: "",
+					address: "",
+					avatar:
+						result.data.user.image || "/placeholder.svg?height=200&width=200",
+					memberSince: new Date(result.data.user.createdAt)
+						.toISOString()
+						.split("T")[0],
+					verifications: {
+						email: true,
+						phone: false,
+						identity: false,
+					},
+					preferences: {
+						emailNotifications: {
+							newListings: true,
+							applicationUpdates: true,
+							messageAlerts: true,
+							promotions: false,
+						},
+						pushNotifications: {
+							newListings: false,
+							applicationUpdates: true,
+							messageAlerts: true,
+							promotions: false,
+						},
+					},
+					savedSearches: [],
+					favoriteListings: [],
 				};
 
 				// Save to state
 				setUser(userData);
 
-				// Initialize onboarding for new users
-				if (isNewUser) {
+				// Initialize onboarding for new users who haven't completed onboarding
+				if (!onboardingCompleted) {
 					setOnboardingState({
 						step: 1,
+						role: userRole as User["role"], // Type assertion to fix type error
 						preferences: {},
 						profile: {
 							name: userData.name,
@@ -215,8 +313,22 @@ export function UserProvider({ children }: UserProviderProps) {
 			const result = await registerAction(email, password, firstName, lastName);
 
 			if (result.success && result.data) {
-				// Auto login after registration
-				return await login(email, password);
+				// For new registrations, auto login and ensure onboarding is shown
+				// In the case of registration, we know the user is new and needs onboarding
+				const loginResult = await login(email, password);
+
+				// Even if the database has onboardingCompleted set (it shouldn't for new users),
+				// we'll make sure to set it to false for the UI and then update database
+				if (loginResult.success && user) {
+					// Set onboarding to not completed for new registrations
+					if (user.onboardingCompleted) {
+						await updateUser({ onboardingCompleted: false });
+						// Ensure database is also updated
+						await updateOnboardingStatus(user.id, false);
+					}
+				}
+
+				return loginResult;
 			}
 
 			return {
@@ -306,6 +418,16 @@ export function UserProvider({ children }: UserProviderProps) {
 				} else {
 					console.log(`Role assigned in database: ${onboardingState.role}`);
 				}
+			}
+
+			// Update onboarding status in the database (make it the source of truth)
+			const onboardingResult = await updateOnboardingStatus(user.id, true);
+			if (!onboardingResult.success) {
+				console.error(
+					`Failed to update onboarding status: ${onboardingResult.error}`,
+				);
+			} else {
+				console.log("Onboarding completed status saved to database");
 			}
 
 			setOnboardingState(null);

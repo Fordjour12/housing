@@ -355,10 +355,12 @@ export default function PropertyManagerSetupFlow() {
 		});
 
 		// Complete the onboarding process
+		// This will update the database as the source of truth
 		await completeOnboarding();
 
-		// Redirect to dashboard (optional - the completeOnboarding usually handles this)
-		window.location.href = "/dashboard";
+		// Redirect to listings page instead of dashboard
+		// The database is now the source of truth for onboarding status
+		window.location.href = "/listings";
 	};
 
 	// Standard bottom navigation component
