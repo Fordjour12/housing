@@ -10,6 +10,78 @@ export interface User {
 	profilePicture?: string;
 	createdAt: string;
 	lastLogin: string;
+	// Additional fields for account profile
+	phone?: string;
+	bio?: string;
+	address?: string;
+	avatar?: string;
+	memberSince?: string;
+	verifications?: {
+		email: boolean;
+		phone: boolean;
+		identity: boolean;
+	};
+	preferences?: {
+		emailNotifications?: {
+			newListings?: boolean;
+			applicationUpdates?: boolean;
+			messageAlerts?: boolean;
+			promotions?: boolean;
+		};
+		pushNotifications?: {
+			newListings?: boolean;
+			applicationUpdates?: boolean;
+			messageAlerts?: boolean;
+			promotions?: boolean;
+		};
+	};
+	savedSearches?: Array<{
+		id: string;
+		name: string;
+		criteria: string;
+		location: string;
+		priceRange: string;
+		bedrooms: string;
+		created: string;
+		lastNotified: string;
+		newListings: number;
+	}>;
+	favoriteListings?: Array<{
+		id: number;
+		title: string;
+		address: string;
+		price: number;
+		beds: number;
+		baths: number;
+		sqft: number;
+		image: string;
+		saved: string;
+	}>;
+	// Additional fields for the account profile
+	rentalApplications?: Array<{
+		id: string;
+		property: string;
+		address: string;
+		landlord: string;
+		submitted: string;
+		status: "under_review" | "approved" | "rejected" | "pending";
+		nextSteps: string;
+	}>;
+	paymentMethods?: Array<{
+		id: string;
+		type: "credit" | "debit" | "bank";
+		last4: string;
+		expiry: string;
+		brand: string;
+		isDefault: boolean;
+	}>;
+	subscriptionPlan?: {
+		name: string;
+		price: number;
+		billingCycle: string;
+		nextBilling: string;
+		features: string[];
+	};
 }
 
 // Define property manager setup preference structure
@@ -41,7 +113,11 @@ export interface PropertyManagerSetupPreference {
 	team: {
 		teamMembers?: Array<{
 			email: string;
-			role: "administrator" | "property_manager" | "leasing_agent" | "maintenance_technician";
+			role:
+				| "administrator"
+				| "property_manager"
+				| "leasing_agent"
+				| "maintenance_technician";
 		}>;
 	};
 	property?: {
@@ -50,7 +126,12 @@ export interface PropertyManagerSetupPreference {
 		city?: string;
 		state?: string;
 		zip?: string;
-		propertyType?: "single_family" | "multi_family" | "apartment" | "condo" | "townhouse";
+		propertyType?:
+			| "single_family"
+			| "multi_family"
+			| "apartment"
+			| "condo"
+			| "townhouse";
 		bedrooms?: string;
 		bathrooms?: string;
 		squareFootage?: string;
@@ -64,10 +145,28 @@ export interface PropertyManagerSetupPreference {
 		leaseDurations?: Array<"month-to-month" | "6-months" | "1-year" | "other">;
 		availabilityDate?: Date;
 		description?: string;
-		amenities?: Array<"laundry" | "parking" | "pet-friendly" | "ac" | "dishwasher" | "balcony" | "pool" | "gym" | "elevator" | "wheelchair">;
-		petPolicy?: "no-pets" | "cats-only" | "dogs-only" | "cats-and-dogs" | "case-by-case";
+		amenities?: Array<
+			| "laundry"
+			| "parking"
+			| "pet-friendly"
+			| "ac"
+			| "dishwasher"
+			| "balcony"
+			| "pool"
+			| "gym"
+			| "elevator"
+			| "wheelchair"
+		>;
+		petPolicy?:
+			| "no-pets"
+			| "cats-only"
+			| "dogs-only"
+			| "cats-and-dogs"
+			| "case-by-case";
 		petRestrictions?: string;
-		utilitiesIncluded?: Array<"water" | "electricity" | "gas" | "trash" | "internet">;
+		utilitiesIncluded?: Array<
+			"water" | "electricity" | "gas" | "trash" | "internet"
+		>;
 	};
 	photos?: string[];
 }
@@ -87,7 +186,12 @@ export type PreferenceValue =
 				city?: string;
 				state?: string;
 				zip?: string;
-				propertyType?: "single_family" | "multi_family" | "apartment" | "condo" | "townhouse";
+				propertyType?:
+					| "single_family"
+					| "multi_family"
+					| "apartment"
+					| "condo"
+					| "townhouse";
 				bedrooms?: string;
 				bathrooms?: string;
 				squareFootage?: string;
@@ -96,19 +200,47 @@ export type PreferenceValue =
 			rental: {
 				rentAmount?: string;
 				securityDeposit?: string;
-				leaseDurations?: Array<"month-to-month" | "6-months" | "1-year" | "other">;
+				leaseDurations?: Array<
+					"month-to-month" | "6-months" | "1-year" | "other"
+				>;
 				availabilityDate?: Date;
 				description?: string;
-				amenities?: Array<"laundry" | "parking" | "pet-friendly" | "ac" | "dishwasher" | "balcony" | "pool" | "gym" | "elevator" | "wheelchair">;
-				petPolicy?: "no-pets" | "cats-only" | "dogs-only" | "cats-and-dogs" | "case-by-case";
+				amenities?: Array<
+					| "laundry"
+					| "parking"
+					| "pet-friendly"
+					| "ac"
+					| "dishwasher"
+					| "balcony"
+					| "pool"
+					| "gym"
+					| "elevator"
+					| "wheelchair"
+				>;
+				petPolicy?:
+					| "no-pets"
+					| "cats-only"
+					| "dogs-only"
+					| "cats-and-dogs"
+					| "case-by-case";
 				petRestrictions?: string;
-				utilitiesIncluded?: Array<"water" | "electricity" | "gas" | "trash" | "internet">;
+				utilitiesIncluded?: Array<
+					"water" | "electricity" | "gas" | "trash" | "internet"
+				>;
 			};
 			management: {
 				contactDisplay?: "email" | "phone" | "both";
 				applicationProcess?: "online" | "in-person" | "both";
-				screeningPreferences?: Array<"credit-check" | "background-check" | "income-verification" | "rental-history" | "references">;
-				communicationPreferences?: Array<"email" | "phone" | "text" | "in-person">;
+				screeningPreferences?: Array<
+					| "credit-check"
+					| "background-check"
+					| "income-verification"
+					| "rental-history"
+					| "references"
+				>;
+				communicationPreferences?: Array<
+					"email" | "phone" | "text" | "in-person"
+				>;
 				leaseSigningPreference?: "online" | "in-person" | "both";
 			};
 			photos: string[];

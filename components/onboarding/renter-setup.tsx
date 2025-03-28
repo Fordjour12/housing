@@ -1,20 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useUser } from "@/context/user-context";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import {
 	Card,
 	CardContent,
@@ -22,14 +8,21 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { useUser } from "@/context/user-context";
 import {
-	User,
-	Briefcase,
-	Home,
-	DollarSign,
-	Calendar,
 	BellRing,
+	Briefcase,
+	Calendar,
+	DollarSign,
+	Home,
+	User,
 } from "lucide-react";
+import { useState } from "react";
 
 // Define more specific types for our form data
 interface FormData {
@@ -147,7 +140,13 @@ export default function RenterSetup() {
 			role: onboardingState?.role, // Preserve the role from previous onboarding step
 		});
 
+		// Complete the onboarding process
+		// This will update the database as the source of truth for onboarding status
 		await completeOnboarding();
+
+		// Redirect to listings page
+		// The database is now the source of truth for onboarding status
+		window.location.href = "/listings";
 	};
 
 	return (

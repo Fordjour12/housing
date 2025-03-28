@@ -2,10 +2,9 @@
 
 import type React from "react";
 
-import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -13,13 +12,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -27,30 +21,36 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import {
-	User,
-	Heart,
-	Search,
-	FileText,
-	Settings,
-	CreditCard,
-	LogOut,
-	Home,
-	Edit,
-	Save,
-	Upload,
-	ExternalLink,
-	Trash2,
 	AlertCircle,
+	Bath,
+	BedDouble,
 	CheckCircle,
 	Clock,
-	Plus,
+	CreditCard,
+	Edit,
+	ExternalLink,
 	Eye,
+	FileText,
+	Heart,
+	Home,
+	LogOut,
 	MessageSquare,
-	BedDouble,
-	Bath,
+	Plus,
+	Save,
+	Search,
+	Settings,
 	Square,
+	Trash2,
+	Upload,
+	User as UserIcon,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 // Add the import for GoogleMapComponent at the top of the file
 import GoogleMapComponent, {
@@ -60,147 +60,93 @@ import GoogleMapComponent, {
 // Add the NotificationDemo import at the top of the file
 import { NotificationDemo } from "@/components/notification-demo";
 
-// Sample user data
-const USER_DATA = {
-	id: "user123",
-	name: "Alex Johnson",
-	email: "alex.johnson@example.com",
-	phone: "(555) 123-4567",
-	avatar: "/placeholder.svg?height=200&width=200&text=AJ",
-	bio: "Looking for a pet-friendly apartment in downtown with easy access to public transportation.",
-	address: "123 Main St, Apt 4B, Houston, TX 77002",
-	role: "renter", // or "landlord" or "both"
-	memberSince: "2022-06-15",
-	verifications: {
-		email: true,
-		phone: true,
-		identity: false,
-	},
-	preferences: {
-		emailNotifications: {
-			newListings: true,
-			applicationUpdates: true,
-			messageAlerts: true,
-			promotions: false,
-		},
-		pushNotifications: {
-			newListings: false,
-			applicationUpdates: true,
-			messageAlerts: true,
-			promotions: false,
-		},
-	},
-	savedSearches: [
-		{
-			id: "search1",
-			name: "Downtown 2BR",
-			criteria: "2 bedroom apartments in Downtown Houston",
-			location: "Downtown Houston",
-			priceRange: "$1,200 - $1,800",
-			bedrooms: "2",
-			created: "2023-09-15",
-			lastNotified: "2023-11-01",
-			newListings: 3,
-		},
-		{
-			id: "search2",
-			name: "Pet-friendly near park",
-			criteria: "Pet-friendly rentals near Memorial Park",
-			location: "Memorial Park area",
-			priceRange: "$1,000 - $1,500",
-			bedrooms: "1-2",
-			created: "2023-10-02",
-			lastNotified: "2023-10-28",
-			newListings: 1,
-		},
-	],
-	favoriteListings: [
-		{
-			id: 1,
-			title: "Cozy 2 Bedroom Apartment",
-			address: "123 Main St, Houston, TX",
-			price: 1650,
-			beds: 2,
-			baths: 2,
-			sqft: 1200,
-			image: "/placeholder.svg?height=400&width=600&text=Property 1",
-			saved: "2023-10-20",
-		},
-		{
-			id: 4,
-			title: "Luxury 4 Bedroom Villa",
-			address: "101 Park Lane, Houston, TX",
-			price: 2950,
-			beds: 4,
-			baths: 3,
-			sqft: 2500,
-			image: "/placeholder.svg?height=400&width=600&text=Property 4",
-			saved: "2023-11-05",
-		},
-	],
-	rentalApplications: [
-		{
-			id: "app1",
-			property: "Cozy 2 Bedroom Apartment",
-			address: "123 Main St, Houston, TX",
-			landlord: "Sarah Johnson",
-			submitted: "2023-10-25",
-			status: "under_review",
-			nextSteps: "Background check in progress",
-		},
-		{
-			id: "app2",
-			property: "Modern Studio Downtown",
-			address: "456 Center Ave, Houston, TX",
-			landlord: "Michael Rodriguez",
-			submitted: "2023-09-18",
-			status: "approved",
-			nextSteps: "Lease agreement pending",
-		},
-	],
-	paymentMethods: [
-		{
-			id: "card1",
-			type: "credit",
-			last4: "4242",
-			expiry: "05/25",
-			brand: "Visa",
-			isDefault: true,
-		},
-		{
-			id: "card2",
-			type: "credit",
-			last4: "1234",
-			expiry: "12/24",
-			brand: "Mastercard",
-			isDefault: false,
-		},
-	],
-	subscriptionPlan: {
-		name: "Landlord Pro",
-		price: 29.99,
-		billingCycle: "monthly",
-		nextBilling: "2023-12-01",
-		features: [
-			"Unlimited listings",
-			"Featured properties",
-			"Analytics dashboard",
-		],
-	},
-};
+// Add useUser import
+import { useUser } from "@/context/user-context";
+import type { User } from "@/types/user";
 
 export default function AccountProfile() {
-	const [user, setUser] = useState(USER_DATA);
+	const {
+		user: contextUser,
+		updateUser,
+		logout,
+		isLoading: isContextLoading,
+	} = useUser();
+	const [user, setUser] = useState<User | null>(null);
 	const [activeTab, setActiveTab] = useState("profile");
 	const [editMode, setEditMode] = useState(false);
-	const [formData, setFormData] = useState({
-		name: user.name,
-		email: user.email,
-		phone: user.phone,
-		bio: user.bio,
-		address: user.address,
-	});
 	const [isSaving, setIsSaving] = useState(false);
+
+	// Initialize user from context when available
+	useEffect(() => {
+		if (contextUser) {
+			setUser({
+				...contextUser,
+				// Default values for optional properties
+				avatar:
+					contextUser.avatar ||
+					contextUser.profilePicture ||
+					"/placeholder.svg?height=200&width=200",
+				memberSince:
+					contextUser.memberSince ||
+					(contextUser.createdAt
+						? new Date(contextUser.createdAt).toISOString().split("T")[0]
+						: new Date().toISOString().split("T")[0]),
+				verifications: contextUser.verifications || {
+					email: true,
+					phone: false,
+					identity: false,
+				},
+				preferences: contextUser.preferences || {
+					emailNotifications: {
+						newListings: true,
+						applicationUpdates: true,
+						messageAlerts: true,
+						promotions: false,
+					},
+					pushNotifications: {
+						newListings: false,
+						applicationUpdates: true,
+						messageAlerts: true,
+						promotions: false,
+					},
+				},
+				savedSearches: contextUser.savedSearches || [],
+				favoriteListings: contextUser.favoriteListings || [],
+				rentalApplications: contextUser.rentalApplications || [],
+				paymentMethods: contextUser.paymentMethods || [],
+				// Provide a default subscription plan for demo purposes - in a real app, this would come from a database
+				subscriptionPlan: contextUser.subscriptionPlan || {
+					name: "Free",
+					price: 0,
+					billingCycle: "monthly",
+					nextBilling: "-",
+					features: ["Basic listings", "Standard search"],
+				},
+			});
+		}
+	}, [contextUser]);
+
+	// Initialize form data from user
+	const [formData, setFormData] = useState({
+		name: "",
+		email: "",
+		phone: "",
+		bio: "",
+		address: "",
+	});
+
+	// Update form data when user changes
+	useEffect(() => {
+		if (user) {
+			setFormData({
+				name: user.name || "",
+				email: user.email || "",
+				phone: user.phone || "",
+				bio: user.bio || "",
+				address: user.address || "",
+			});
+		}
+	}, [user]);
 
 	// Add state for the highlighted property
 	const [highlightedProperty, setHighlightedProperty] = useState<number | null>(
@@ -217,10 +163,21 @@ export default function AccountProfile() {
 		});
 	};
 
-	const handleSaveProfile = () => {
+	const handleSaveProfile = async () => {
+		if (!user) return;
+
 		setIsSaving(true);
-		// Simulate API call
-		setTimeout(() => {
+		try {
+			// Call the updateUser function from context to save the changes to the backend
+			await updateUser({
+				name: formData.name,
+				email: formData.email,
+				phone: formData.phone,
+				bio: formData.bio,
+				address: formData.address,
+			});
+
+			// Update local state after successful API call
 			setUser({
 				...user,
 				name: formData.name,
@@ -229,29 +186,50 @@ export default function AccountProfile() {
 				bio: formData.bio,
 				address: formData.address,
 			});
-			setIsSaving(false);
 			setEditMode(false);
-		}, 1000);
+		} catch (error) {
+			console.error("Failed to update profile:", error);
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
+	// Update handleToggleNotification with explicit typing for preferences
 	const handleToggleNotification = (
 		category: string,
 		type: "email" | "push",
 		value: boolean,
 	) => {
+		if (!user) return;
+
+		// Create a deep copy of current preferences or empty object
+		const currentEmailNotifications =
+			user.preferences?.emailNotifications || {};
+		const currentPushNotifications = user.preferences?.pushNotifications || {};
+
+		// Build new preferences based on notification type
+		const newPreferences = {
+			...user.preferences,
+			emailNotifications:
+				type === "email"
+					? { ...currentEmailNotifications, [category]: value }
+					: currentEmailNotifications,
+			pushNotifications:
+				type === "push"
+					? { ...currentPushNotifications, [category]: value }
+					: currentPushNotifications,
+		};
+
 		setUser({
 			...user,
-			preferences: {
-				...user.preferences,
-				[`${type}Notifications`]: {
-					...user.preferences[`${type}Notifications`],
-					[category]: value,
-				},
-			},
+			preferences: newPreferences,
 		});
 	};
 
+	// Fix other handlers with null checks and proper typing
 	const handleRemoveSavedSearch = (id: string) => {
+		if (!user || !user.savedSearches) return;
+
 		setUser({
 			...user,
 			savedSearches: user.savedSearches.filter((search) => search.id !== id),
@@ -259,6 +237,8 @@ export default function AccountProfile() {
 	};
 
 	const handleRemoveFavorite = (id: number) => {
+		if (!user || !user.favoriteListings) return;
+
 		setUser({
 			...user,
 			favoriteListings: user.favoriteListings.filter(
@@ -267,13 +247,62 @@ export default function AccountProfile() {
 		});
 	};
 
-	const isRenter = user.role === "renter" || user.role === "both";
-	const isLandlord = user.role === "landlord" || user.role === "both";
+	// Update role checks for proper UserRole types
+	const isRenter = user?.role === "renter";
+	const isLandlord =
+		user?.role === "landlord" || user?.role === "property_manager";
 
-	// Inside the AccountProfile component, add this function before the return statement
+	// Check if the component is in a loading state
+	const isLoading = isContextLoading || (!user && contextUser !== null);
+
+	// Show loading state when user data is not yet available
+	if (isLoading) {
+		return (
+			<div className="container py-10">
+				<div className="flex items-center justify-center h-[50vh]">
+					<div className="text-center">
+						<div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
+						<p className="text-muted-foreground">Loading profile data...</p>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	// If not loading but user is null, show a message
+	if (!user && !isLoading) {
+		return (
+			<div className="container py-10">
+				<div className="flex items-center justify-center h-[50vh]">
+					<div className="text-center">
+						<p className="font-medium text-xl mb-2">
+							Please log in to view your profile
+						</p>
+						<Button asChild>
+							<Link href="/login">Log In</Link>
+						</Button>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	// At this point, we know user is not null
+	const userData = user as User;
+
+	// Role checks for the interface
+	const isRenterView = userData.role === "renter";
+	const isLandlordView =
+		userData.role === "landlord" || userData.role === "property_manager";
+
+	// Function to get properties for map display
 	const getSavedSearchProperties = (): PropertyLocation[] => {
 		// Convert favorite listings to map properties
-		return user.favoriteListings.map((listing) => ({
+		if (!userData.favoriteListings || userData.favoriteListings.length === 0) {
+			return [];
+		}
+
+		return userData.favoriteListings.map((listing) => ({
 			id: listing.id,
 			title: listing.title,
 			address: listing.address,
@@ -287,10 +316,95 @@ export default function AccountProfile() {
 		}));
 	};
 
+	// Handler for saving profile changes
+	const handleSaveProfileWithUserData = async () => {
+		setIsSaving(true);
+		try {
+			// Call the updateUser function from context to save the changes to the backend
+			await updateUser({
+				name: formData.name,
+				email: formData.email,
+				phone: formData.phone,
+				bio: formData.bio,
+				address: formData.address,
+			});
+
+			// Update local state after successful API call
+			setUser({
+				...userData,
+				name: formData.name,
+				email: formData.email,
+				phone: formData.phone,
+				bio: formData.bio,
+				address: formData.address,
+			});
+			setEditMode(false);
+		} catch (error) {
+			console.error("Failed to update profile:", error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	// Handler for toggling notification preferences
+	const handleToggleNotificationWithUserData = (
+		category: string,
+		type: "email" | "push",
+		value: boolean,
+	) => {
+		// Create a deep copy of current preferences or empty object
+		const currentEmailNotifications =
+			userData.preferences?.emailNotifications || {};
+		const currentPushNotifications =
+			userData.preferences?.pushNotifications || {};
+
+		// Build new preferences based on notification type
+		const newPreferences = {
+			...userData.preferences,
+			emailNotifications:
+				type === "email"
+					? { ...currentEmailNotifications, [category]: value }
+					: currentEmailNotifications,
+			pushNotifications:
+				type === "push"
+					? { ...currentPushNotifications, [category]: value }
+					: currentPushNotifications,
+		};
+
+		setUser({
+			...userData,
+			preferences: newPreferences,
+		});
+	};
+
+	// Handler for removing saved searches
+	const handleRemoveSavedSearchWithUserData = (id: string) => {
+		if (!userData.savedSearches) return;
+
+		setUser({
+			...userData,
+			savedSearches: userData.savedSearches.filter(
+				(search) => search.id !== id,
+			),
+		});
+	};
+
+	// Handler for removing favorite listings
+	const handleRemoveFavoriteWithUserData = (id: number) => {
+		if (!userData.favoriteListings) return;
+
+		setUser({
+			...userData,
+			favoriteListings: userData.favoriteListings.filter(
+				(listing) => listing.id !== id,
+			),
+		});
+	};
+
 	return (
 		<div className="flex flex-col space-y-8">
-			{/* Role switcher (if user has both roles) */}
-			{user.role === "both" && (
+			{/* Role switcher (if user has multiple roles) */}
+			{isRenter && isLandlord && (
 				<Card>
 					<CardContent className="p-6">
 						<div className="flex items-center justify-between">
@@ -318,7 +432,7 @@ export default function AccountProfile() {
 			<Tabs defaultValue="profile" onValueChange={setActiveTab} className="">
 				<TabsList className="mx-2">
 					<TabsTrigger value="profile" className="flex items-center gap-2">
-						<User className="h-4 w-4" />
+						<UserIcon className="h-4 w-4" />
 						<span>Profile</span>
 					</TabsTrigger>
 
@@ -381,7 +495,10 @@ export default function AccountProfile() {
 									<Button variant="outline" onClick={() => setEditMode(false)}>
 										Cancel
 									</Button>
-									<Button onClick={handleSaveProfile} disabled={isSaving}>
+									<Button
+										onClick={handleSaveProfileWithUserData}
+										disabled={isSaving}
+									>
 										{isSaving ? (
 											<>Saving...</>
 										) : (
@@ -399,12 +516,21 @@ export default function AccountProfile() {
 								{/* Avatar section */}
 								<div className="flex flex-col items-center space-y-4">
 									<Avatar className="h-24 w-24">
-										<AvatarImage src={user.avatar} alt={user.name} />
+										<AvatarImage
+											src={
+												userData.avatar ||
+												userData.profilePicture ||
+												"/placeholder.svg"
+											}
+											alt={userData.name || "User"}
+										/>
 										<AvatarFallback>
-											{user.name
-												.split(" ")
-												.map((n) => n[0])
-												.join("")}
+											{userData.name
+												? userData.name
+														.split(" ")
+														.map((n) => n[0])
+														.join("")
+												: "U"}
 										</AvatarFallback>
 									</Avatar>
 									{editMode && (
@@ -422,7 +548,11 @@ export default function AccountProfile() {
 											Member since
 										</p>
 										<p className="font-medium">
-											{new Date(user.memberSince).toLocaleDateString()}
+											{userData.memberSince
+												? new Date(userData.memberSince).toLocaleDateString()
+												: userData.createdAt
+													? new Date(userData.createdAt).toLocaleDateString()
+													: "-"}
 										</p>
 									</div>
 								</div>
@@ -489,15 +619,15 @@ export default function AccountProfile() {
 													<p className="text-sm font-medium text-muted-foreground">
 														Full Name
 													</p>
-													<p className="text-base">{user.name}</p>
+													<p className="text-base">{userData.name}</p>
 												</div>
 												<div>
 													<p className="text-sm font-medium text-muted-foreground">
 														Email
 													</p>
 													<p className="text-base flex items-center">
-														{user.email}
-														{user.verifications.email && (
+														{userData.email}
+														{userData.verifications?.email && (
 															<Badge
 																variant="outline"
 																className="ml-2 text-xs bg-green-50 text-green-700 border-green-200"
@@ -513,8 +643,8 @@ export default function AccountProfile() {
 														Phone Number
 													</p>
 													<p className="text-base flex items-center">
-														{user.phone}
-														{user.verifications.phone && (
+														{userData.phone}
+														{userData.verifications?.phone && (
 															<Badge
 																variant="outline"
 																className="ml-2 text-xs bg-green-50 text-green-700 border-green-200"
@@ -529,14 +659,14 @@ export default function AccountProfile() {
 													<p className="text-sm font-medium text-muted-foreground">
 														Address
 													</p>
-													<p className="text-base">{user.address}</p>
+													<p className="text-base">{userData.address}</p>
 												</div>
 											</div>
 											<div>
 												<p className="text-sm font-medium text-muted-foreground">
 													Bio
 												</p>
-												<p className="text-base">{user.bio}</p>
+												<p className="text-base">{userData.bio}</p>
 											</div>
 											<div>
 												<p className="text-sm font-medium text-muted-foreground">
@@ -564,12 +694,12 @@ export default function AccountProfile() {
 										<div className="flex items-center p-4 border rounded-lg">
 											<div
 												className={`h-10 w-10 rounded-full flex items-center justify-center ${
-													user.verifications.email
+													userData.verifications?.email
 														? "bg-green-100 text-green-600"
 														: "bg-gray-100 text-gray-500"
 												}`}
 											>
-												{user.verifications.email ? (
+												{userData.verifications?.email ? (
 													<CheckCircle className="h-5 w-5" />
 												) : (
 													<AlertCircle className="h-5 w-5" />
@@ -578,12 +708,12 @@ export default function AccountProfile() {
 											<div className="ml-4">
 												<p className="font-medium">Email</p>
 												<p className="text-sm text-muted-foreground">
-													{user.verifications.email
+													{userData.verifications?.email
 														? "Verified"
 														: "Not verified"}
 												</p>
 											</div>
-											{!user.verifications.email && (
+											{!userData.verifications?.email && (
 												<Button variant="outline" size="sm" className="ml-auto">
 													Verify
 												</Button>
@@ -592,12 +722,12 @@ export default function AccountProfile() {
 										<div className="flex items-center p-4 border rounded-lg">
 											<div
 												className={`h-10 w-10 rounded-full flex items-center justify-center ${
-													user.verifications.phone
+													userData.verifications?.phone
 														? "bg-green-100 text-green-600"
 														: "bg-gray-100 text-gray-500"
 												}`}
 											>
-												{user.verifications.phone ? (
+												{userData.verifications?.phone ? (
 													<CheckCircle className="h-5 w-5" />
 												) : (
 													<AlertCircle className="h-5 w-5" />
@@ -606,12 +736,12 @@ export default function AccountProfile() {
 											<div className="ml-4">
 												<p className="font-medium">Phone</p>
 												<p className="text-sm text-muted-foreground">
-													{user.verifications.phone
+													{userData.verifications?.phone
 														? "Verified"
 														: "Not verified"}
 												</p>
 											</div>
-											{!user.verifications.phone && (
+											{!userData.verifications?.phone && (
 												<Button variant="outline" size="sm" className="ml-auto">
 													Verify
 												</Button>
@@ -620,12 +750,12 @@ export default function AccountProfile() {
 										<div className="flex items-center p-4 border rounded-lg">
 											<div
 												className={`h-10 w-10 rounded-full flex items-center justify-center ${
-													user.verifications.identity
+													userData.verifications?.identity
 														? "bg-green-100 text-green-600"
 														: "bg-gray-100 text-gray-500"
 												}`}
 											>
-												{user.verifications.identity ? (
+												{userData.verifications?.identity ? (
 													<CheckCircle className="h-5 w-5" />
 												) : (
 													<AlertCircle className="h-5 w-5" />
@@ -634,12 +764,12 @@ export default function AccountProfile() {
 											<div className="ml-4">
 												<p className="font-medium">Identity</p>
 												<p className="text-sm text-muted-foreground">
-													{user.verifications.identity
+													{userData.verifications?.identity
 														? "Verified"
 														: "Not verified"}
 												</p>
 											</div>
-											{!user.verifications.identity && (
+											{!userData.verifications?.identity && (
 												<Button variant="outline" size="sm" className="ml-auto">
 													Verify
 												</Button>
@@ -668,9 +798,9 @@ export default function AccountProfile() {
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								{user.savedSearches.length > 0 ? (
+								{userData.savedSearches && userData.savedSearches.length > 0 ? (
 									<div className="space-y-4">
-										{user.savedSearches.map((search) => (
+										{userData.savedSearches.map((search) => (
 											<div key={search.id} className="border rounded-lg p-4">
 												<div className="flex justify-between items-start">
 													<div>
@@ -695,7 +825,9 @@ export default function AccountProfile() {
 														<Button
 															variant="ghost"
 															size="sm"
-															onClick={() => handleRemoveSavedSearch(search.id)}
+															onClick={() =>
+																handleRemoveSavedSearchWithUserData(search.id)
+															}
 															className="text-destructive hover:text-destructive"
 														>
 															<Trash2 className="h-4 w-4" />
@@ -768,9 +900,10 @@ export default function AccountProfile() {
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								{user.favoriteListings.length > 0 ? (
+								{userData.favoriteListings &&
+								userData.favoriteListings.length > 0 ? (
 									<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-										{user.favoriteListings.map((listing) => (
+										{userData.favoriteListings.map((listing) => (
 											<div
 												key={listing.id}
 												className="border rounded-lg overflow-hidden"
@@ -792,7 +925,9 @@ export default function AccountProfile() {
 															<Button
 																variant="ghost"
 																size="icon"
-																onClick={() => handleRemoveFavorite(listing.id)}
+																onClick={() =>
+																	handleRemoveFavoriteWithUserData(listing.id)
+																}
 																className="text-destructive hover:text-destructive h-8 w-8"
 															>
 																<Trash2 className="h-4 w-4" />
@@ -846,23 +981,24 @@ export default function AccountProfile() {
 								)}
 							</CardContent>
 						</Card>
-						{user.favoriteListings.length > 0 && (
-							<Card className="mt-6">
-								<CardHeader>
-									<CardTitle>Map View</CardTitle>
-									<CardDescription>
-										View your favorite properties on the map
-									</CardDescription>
-								</CardHeader>
-								<CardContent>
-									<GoogleMapComponent
-										properties={getSavedSearchProperties()}
-										height="400px"
-										highlightedProperty={highlightedProperty}
-									/>
-								</CardContent>
-							</Card>
-						)}
+						{userData.favoriteListings &&
+							userData.favoriteListings.length > 0 && (
+								<Card className="mt-6">
+									<CardHeader>
+										<CardTitle>Map View</CardTitle>
+										<CardDescription>
+											View your favorite properties on the map
+										</CardDescription>
+									</CardHeader>
+									<CardContent>
+										<GoogleMapComponent
+											properties={getSavedSearchProperties()}
+											height="400px"
+											highlightedProperty={highlightedProperty}
+										/>
+									</CardContent>
+								</Card>
+							)}
 					</TabsContent>
 				)}
 
@@ -877,9 +1013,10 @@ export default function AccountProfile() {
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
-								{user.rentalApplications.length > 0 ? (
+								{userData.rentalApplications &&
+								userData.rentalApplications.length > 0 ? (
 									<div className="space-y-4">
-										{user.rentalApplications.map((application) => (
+										{userData.rentalApplications.map((application) => (
 											<div
 												key={application.id}
 												className="border rounded-lg p-4"
@@ -1059,7 +1196,7 @@ export default function AccountProfile() {
 									<div className="space-y-4">
 										<div className="flex items-start gap-3">
 											<div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-												<User className="h-4 w-4 text-blue-600" />
+												<UserIcon className="h-4 w-4 text-blue-600" />
 											</div>
 											<div>
 												<p className="text-sm">
@@ -1118,16 +1255,16 @@ export default function AccountProfile() {
 							</CardHeader>
 							<CardContent className="space-y-6">
 								{/* Subscription Plan */}
-								{user.subscriptionPlan && (
+								{userData.subscriptionPlan && (
 									<div className="border rounded-lg p-6">
 										<div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
 											<div>
 												<h3 className="text-lg font-medium">
-													{user.subscriptionPlan.name}
+													{userData.subscriptionPlan.name}
 												</h3>
 												<p className="text-sm text-muted-foreground">
-													${user.subscriptionPlan.price}/
-													{user.subscriptionPlan.billingCycle}
+													${userData.subscriptionPlan.price}/
+													{userData.subscriptionPlan.billingCycle}
 												</p>
 											</div>
 											<div className="flex gap-2">
@@ -1147,7 +1284,7 @@ export default function AccountProfile() {
 											<p className="text-sm text-muted-foreground">
 												Next billing date:{" "}
 												{new Date(
-													user.subscriptionPlan.nextBilling,
+													userData.subscriptionPlan.nextBilling,
 												).toLocaleDateString()}
 											</p>
 										</div>
@@ -1156,7 +1293,7 @@ export default function AccountProfile() {
 												Plan Features
 											</h4>
 											<ul className="space-y-1">
-												{user.subscriptionPlan.features.map(
+												{userData.subscriptionPlan.features.map(
 													(feature, index) => (
 														<li
 															// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
@@ -1182,7 +1319,7 @@ export default function AccountProfile() {
 										</Button>
 									</div>
 									<div className="space-y-3">
-										{user.paymentMethods.map((method) => (
+										{userData.paymentMethods?.map((method) => (
 											<div
 												key={method.id}
 												className="border rounded-lg p-4 flex justify-between items-center"
@@ -1364,10 +1501,11 @@ export default function AccountProfile() {
 											<Switch
 												id="email-new-listings"
 												checked={
-													user.preferences.emailNotifications.newListings
+													userData.preferences?.emailNotifications
+														?.newListings || false
 												}
 												onCheckedChange={(checked) =>
-													handleToggleNotification(
+													handleToggleNotificationWithUserData(
 														"newListings",
 														"email",
 														checked,
@@ -1388,10 +1526,11 @@ export default function AccountProfile() {
 											<Switch
 												id="email-application-updates"
 												checked={
-													user.preferences.emailNotifications.applicationUpdates
+													userData.preferences?.emailNotifications
+														?.applicationUpdates || false
 												}
 												onCheckedChange={(checked) =>
-													handleToggleNotification(
+													handleToggleNotificationWithUserData(
 														"applicationUpdates",
 														"email",
 														checked,
@@ -1411,10 +1550,11 @@ export default function AccountProfile() {
 											<Switch
 												id="email-message-alerts"
 												checked={
-													user.preferences.emailNotifications.messageAlerts
+													userData.preferences?.emailNotifications
+														?.messageAlerts || false
 												}
 												onCheckedChange={(checked) =>
-													handleToggleNotification(
+													handleToggleNotificationWithUserData(
 														"messageAlerts",
 														"email",
 														checked,
@@ -1434,9 +1574,12 @@ export default function AccountProfile() {
 											</div>
 											<Switch
 												id="email-promotions"
-												checked={user.preferences.emailNotifications.promotions}
+												checked={
+													userData.preferences?.emailNotifications
+														?.promotions || false
+												}
 												onCheckedChange={(checked) =>
-													handleToggleNotification(
+													handleToggleNotificationWithUserData(
 														"promotions",
 														"email",
 														checked,
@@ -1462,9 +1605,12 @@ export default function AccountProfile() {
 											</div>
 											<Switch
 												id="push-new-listings"
-												checked={user.preferences.pushNotifications.newListings}
+												checked={
+													userData.preferences?.pushNotifications
+														?.newListings || false
+												}
 												onCheckedChange={(checked) =>
-													handleToggleNotification(
+													handleToggleNotificationWithUserData(
 														"newListings",
 														"push",
 														checked,
@@ -1485,10 +1631,11 @@ export default function AccountProfile() {
 											<Switch
 												id="push-application-updates"
 												checked={
-													user.preferences.pushNotifications.applicationUpdates
+													userData.preferences?.pushNotifications
+														?.applicationUpdates || false
 												}
 												onCheckedChange={(checked) =>
-													handleToggleNotification(
+													handleToggleNotificationWithUserData(
 														"applicationUpdates",
 														"push",
 														checked,
@@ -1508,10 +1655,11 @@ export default function AccountProfile() {
 											<Switch
 												id="push-message-alerts"
 												checked={
-													user.preferences.pushNotifications.messageAlerts
+													userData.preferences?.pushNotifications
+														?.messageAlerts || false
 												}
 												onCheckedChange={(checked) =>
-													handleToggleNotification(
+													handleToggleNotificationWithUserData(
 														"messageAlerts",
 														"push",
 														checked,
@@ -1531,9 +1679,12 @@ export default function AccountProfile() {
 											</div>
 											<Switch
 												id="push-promotions"
-												checked={user.preferences.pushNotifications.promotions}
+												checked={
+													userData.preferences?.pushNotifications?.promotions ||
+													false
+												}
 												onCheckedChange={(checked) =>
-													handleToggleNotification(
+													handleToggleNotificationWithUserData(
 														"promotions",
 														"push",
 														checked,
@@ -1625,7 +1776,11 @@ export default function AccountProfile() {
 
 			{/* Logout button */}
 			<div className="flex justify-end">
-				<Button variant="outline" className="flex items-center gap-1">
+				<Button
+					variant="outline"
+					className="flex items-center gap-1"
+					onClick={logout}
+				>
 					<LogOut className="h-4 w-4" />
 					<span>Log Out</span>
 				</Button>
