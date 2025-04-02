@@ -1,0 +1,324 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Below, I’ll create a rules file specifically for the Drizzle ORM schema, designed to keep the database schema modular, type-safe, and adaptable for both human developers and AI contributors. The schema will be split into separate files, each exported via a root `index.ts` file. Each file will include types for selecting and inserting data, along with suggestions to ensure consistency and flexibility. This setup will align with the property management app we’ve been working on and integrate with the RSC + API approach.
+
+---
+
+### Drizzle Schema Rules File
+
+#### Overview
+This rules file governs the Drizzle ORM schema for the property management web application. The schema is stored in `/schema/` and split into individual files per table (e.g., `user.ts`, `property.ts`). All files are exported via `/schema/index.ts`, which serves as the root entry point. Each table file defines:
+- The table structure using `pgTable`.
+- Relations using `relations`.
+- TypeScript types for selecting and inserting data.
+
+The schema supports PostgreSQL and is used with Next.js 15’s React Server Components (RSC) and Server Actions.
+
+---
+
+### Directory Structure
+```
+/
+├── schema/
+│   ├── account.ts            # Account table
+│   ├── currencySupport.ts    # Currency support table
+│   ├── favorite.ts           # Favorite table
+│   ├── leaseAgreements.ts    # Lease agreements table
+│   ├── maintenanceTickets.ts # Maintenance tickets table
+│   ├── messages.ts           # Messages table
+│   ├── notificationPreferences.ts # Notification preferences table
+│   ├── property.ts           # Property table
+│   ├── propertyAssignment.ts # Property assignment table
+│   ├── propertyAvailability.ts # Property availability table
+│   ├── propertyManagerFirm.ts # Property manager firm table
+│   ├── propertyPerformanceReports.ts # Property performance reports table
+│   ├── rentPayments.ts       # Rent payments table
+│   ├── role.ts              # Role table
+│   ├── savedSearches.ts     # Saved searches table
+│   ├── searchHistory.ts     # Search history table
+│   ├── securityLogs.ts      # Security logs table
+│   ├── session.ts           # Session table
+│   ├── teamMember.ts        # Team member table
+│   ├── tenantFeedback.ts    # Tenant feedback table
+│   ├── usageAnalytics.ts    # Usage analytics table
+│   ├── user.ts              # User table
+│   ├── userRole.ts          # User role junction table
+│   ├── verification.ts      # Verification table
+│   └── index.ts             # Exports all tables and types
+├── lib/db.ts                 # Database connection (e.g., drizzle instance)
+└── drizzle.config.ts        # Drizzle Kit configuration
+```
+
+---
+
+### Core Rules
+
+#### 1. File Structure
+- **Rule**: Each table must have its own file in `/schema/` named after the table (e.g., `property.ts`).
+- **Why**: Keeps the schema modular and manageable.
+- **Implementation**: Define table, relations, and types in each file.
+
+#### 2. Export Everything via `index.ts`
+- **Rule**: `schema/index.ts` must export all tables, relations, and types.
+- **Why**: Provides a single entry point for imports (e.g., `import { property } from '@/schema'`).
+- **Implementation**:
+  ```ts
+  // schema/index.ts
+  export * from './account';
+  export * from './currencySupport';
+  export * from './favorite';
+  export * from './leaseAgreements';
+  export * from './maintenanceTickets';
+  export * from './messages';
+  export * from './notificationPreferences';
+  export * from './property';
+  export * from './propertyAssignment';
+  export * from './propertyAvailability';
+  export * from './propertyManagerFirm';
+  export * from './propertyPerformanceReports';
+  export * from './rentPayments';
+  export * from './role';
+  export * from './savedSearches';
+  export * from './searchHistory';
+  export * from './securityLogs';
+  export * from './session';
+  export * from './teamMember';
+  export * from './tenantFeedback';
+  export * from './usageAnalytics';
+  export * from './user';
+  export * from './userRole';
+  export * from './verification';
+  ```
+
+#### 3. Table Definition
+- **Rule**: Use `pgTable` for table definitions with consistent column types and constraints.
+- **Why**: Ensures compatibility with PostgreSQL and type safety.
+- **Implementation**:
+  - Use `serial` for auto-incrementing IDs(unless other something else if used).
+  - Use `notNull()` and `default()` where applicable.
+  - Use `references()` for foreign keys with `onDelete: 'cascade'` or `onDelete: 'set null'`.
+
+#### 4. Relations
+- **Rule**: Define relations using `relations` for every table with foreign keys.
+- **Why**: Enables type-safe joins and queries in Drizzle ORM.
+- **Implementation**: Use `one` and `many` to define relationships.
+
+#### 5. Select and Insert Types
+- **Rule**: Export `Select[TableName]` and `Insert[TableName]` types for each table.
+- **Why**: Provides type safety for queries and mutations in RSC and Server Actions.
+- **Implementation**:
+  - dont use  as deprecated `InferSelectModel` and `InferInsertModel` from `drizzle-orm`.
+  - Example:
+    ```ts
+    import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
+    export type SelectUser = InferSelectModel<typeof user>;
+    export type InsertUser = InferInsertModel<typeof user>;
+    ```
+    - use table.$inferSelect / table._.inferSelect and table.$inferInsert / table._.inferInsert for more convenient table model type inference.
+    - Example
+    ```ts 
+    type SelectUser = typeof usersTable.$inferSelect;
+    type InsertUser = typeof usersTable.$inferInsert;
+    ```
+
+#### 6. Enums
+- **Rule**: Define enums with `pgEnum` and reuse them across tables.
+- **Why**: Ensures consistency for status fields (e.g., `property_status`).
+- **Implementation**:
+  - Store enums at the top of relevant files or in a separate `enums.ts`.
+  - Example: `export const propertyStatusEnum = pgEnum('property_status', ['active', 'pending', 'inactive']);`.
+
+#### 7. Naming Conventions
+- **Rule**: Use camelCase for variables and types, snake_case for database columns.
+- **Why**: Matches Drizzle ORM conventions and PostgreSQL norms.
+- **Implementation**:
+  - Table: `user`, Column: `created_at`, Type: `SelectUser`.
+
+#### 8. Documentation
+- **Rule**: Add JSDoc comments for each table and type.
+- **Why**: Helps AI and developers understand purpose and usage.
+- **Implementation**:
+  ```ts
+  /** User table for storing user information */
+  export const user = pgTable('user', { ... });
+  ```
+
+#### 9. Consistency Across Files
+- **Rule**: Follow a standard template for each file:
+  1. Imports
+  2. Enums (if applicable)
+  3. Table definition
+  4. Relations
+  5. Types
+- **Why**: Makes files predictable and easy to extend.
+
+---
+
+### Example File: `schema/property.ts`
+
+```ts
+import { pgTable, serial, text, timestamp, boolean, integer, numeric, array, pgEnum } from 'drizzle-orm/pg-core';
+import { relations, InferSelectModel, InferInsertModel } from 'drizzle-orm';
+import { user } from './user';
+
+/** Enum for property status */
+export const propertyStatusEnum = pgEnum('property_status', ['active', 'pending', 'inactive']);
+
+/** Property table for managing rental properties */
+export const property = pgTable('property', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  streetAddress: text('street_address').notNull(),
+  unitNumber: text('unit_number'),
+  city: text('city').notNull(),
+  state: text('state').notNull(),
+  zip: text('zip').notNull(),
+  propertyType: text('property_type').notNull(),
+  bedrooms: integer('bedrooms').notNull(),
+  bathrooms: integer('bathrooms').notNull(),
+  squareFeet: integer('square_feet'),
+  yearBuilt: text('year_built'),
+  rentAmount: numeric('rent_amount', { precision: 10, scale: 2 }).notNull(),
+  securityDeposit: numeric('security_deposit', { precision: 10, scale: 2 }).notNull(),
+  leaseDurations: array('lease_durations', text('lease_durations')).notNull(),
+  availabilityDate: timestamp('availability_date').notNull(),
+  amenities: array('amenities', text('amenities')),
+  petPolicy: text('pet_policy'),
+  petRestrictions: text('pet_restrictions'),
+  utilitiesIncluded: array('utilities_included', text('utilities_included')),
+  contactDisplay: text('contact_display').notNull(),
+  applicationProcess: text('application_process').notNull(),
+  screeningPreferences: array('screening_preferences', text('screening_preferences')),
+  communicationPreferences: array('communication_preferences', text('communication_preferences')),
+  leaseSigningPreference: text('lease_signing_preference').notNull(),
+  photos: array('photos', text('photos')),
+  isAvailable: boolean('is_available').default(true).notNull(),
+  status: propertyStatusEnum('status').default('pending').notNull(),
+  ownerId: serial('owner_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  propertyManagerId: serial('property_manager_id').references(() => user.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/** Relations for the property table */
+export const propertyRelations = relations(property, ({ one, many }) => ({
+  owner: one(user, {
+    fields: [property.ownerId],
+    references: [user.id],
+    relationName: 'owner',
+  }),
+  propertyManager: one(user, {
+    fields: [property.propertyManagerId],
+    references: [user.id],
+    relationName: 'property_manager',
+  }),
+  favorites: many(favorite),
+  assignments: many(propertyAssignment),
+  leaseAgreements: many(leaseAgreements),
+  tenantFeedback: many(tenantFeedback),
+  rentPayments: many(rentPayments),
+  availability: many(propertyAvailability),
+  performanceReports: many(propertyPerformanceReports),
+  maintenanceTickets: many(maintenanceTickets),
+}));
+
+/** Type for selecting properties */
+export type SelectProperty = typeof property.$inferSelect;
+
+/** Type for inserting properties */
+export type InsertProperty = typeof property.$inferInsert;
+```
+
+---
+
+### Suggestions for a Good, Adaptable Rules File
+
+1. **Modularity**:
+   - **Suggestion**: Keep each file self-contained with its own enums and relations.
+   - **Why**: Allows independent updates without breaking other tables.
+
+2. **Type Safety**:
+   - **Suggestion**: Always export `Select` and `Insert` types; use them in RSC and Server Actions.
+   - **Why**: Prevents type errors and aids AI in generating correct queries.
+
+3. **Extensibility**:
+   - **Suggestion**: Use optional fields (e.g., `unitNumber`) and allow nullable columns where future data might be added.
+   - **Why**: Makes schema adaptable to new requirements (e.g., adding `latitude`/`longitude` to `property`).
+
+4. **AI-Friendly**:
+   - **Suggestion**: Include detailed JSDoc comments and consistent naming.
+   - **Why**: Helps AI understand context and generate accurate code (e.g., `/** User table for authentication and roles */`).
+
+5. **Versioning**:
+   - **Suggestion**: Add a `version.ts` file for schema versioning (e.g., `export const SCHEMA_VERSION = '1.0.0';`).
+   - **Why**: Tracks changes and aids migration planning.
+
+6. **Testing**:
+   - **Suggestion**: Add a `test/` directory under `src/db/schema/` with mock data and queries for each table.
+   - **Why**: Ensures schema works as expected and helps AI validate contributions.
+
+7. **Migration Management**:
+   - **Suggestion**: Use `drizzle-kit` for migrations, with a `drizzle.config.ts` file.
+   - **Implementation**:
+     ```ts
+     // src/db/drizzle.config.ts
+     import { defineConfig } from 'drizzle-kit';
+
+     export default defineConfig({
+       schema: './schema/*.ts',
+       out: './drizzle',
+       driver: 'pg',
+       dbCredentials: { connectionString: process.env.DATABASE_URL! },
+     });
+     ```
+   - **Why**: Automates schema updates and keeps database in sync.
+
+8. **Default Values**:
+   - **Suggestion**: Use `defaultNow()` for timestamps and sensible defaults for booleans (e.g., `isAvailable: boolean().default(true)`).
+   - **Why**: Reduces boilerplate in inserts and ensures consistency.
+
+9. **Enums in a Separate File**:
+   - **Suggestion**: Move shared enums to `src/db/schema/enums.ts` (e.g., `propertyStatusEnum`, `paymentStatusEnum`).
+   - **Why**: Avoids duplication and centralizes enum definitions.
+
+10. **Validation**:
+    - **Suggestion**: Add runtime validation (e.g., Zod) for insert types in Server Actions.
+    - **Why**: Catches errors early and helps AI generate safe mutations.
+
+---
+
+### Example: `schema/enums.ts` (Optional)
+```ts
+import { pgEnum } from 'drizzle-orm/pg-core';
+
+export const propertyStatusEnum = pgEnum('property_status', ['active', 'pending', 'inactive']);
+export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'paid', 'late']);
+export const maintenanceStatusEnum = pgEnum('maintenance_status', ['open', 'in_progress', 'resolved']);
+```
+
+Then import in `property.ts`:
+```ts
+import { propertyStatusEnum } from './enums';
+```
+
+---
+
+### Full Schema Implementation
+For brevity, I’ve shown `property.ts`. Apply the same pattern to all tables (e.g., `user.ts`, `rentPayments.ts`) from previous responses, ensuring each has:
+- Table definition
+- Relations
+- `Select` and `Insert` types
+- JSDoc comments
+
+---
+
+### Usage in Project
+- **RSC**: `import { property, SelectProperty } from '@/schema';` in `page.tsx`.
+- **Server Actions**: Use `InsertProperty` for type-safe inserts.
+- **Migrations**: Run `pnpm db:migrate ` after changes.
+
+---

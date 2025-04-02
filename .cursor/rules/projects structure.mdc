@@ -1,7 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-Always look at the sturcture of the project before add any files and folder to the project directory.
-This is very important because it help prevent extra work in placing all the file in their correct location after you are done implement a feature or refactoring the code.

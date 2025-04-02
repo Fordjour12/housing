@@ -3,45 +3,247 @@ description:
 globs: 
 alwaysApply: true
 ---
-You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI and Tailwind.
-  
-  Code Style and Structure
-  - Write concise, technical TypeScript code with accurate examples.
-  - Use functional and declarative programming patterns; avoid classes.
-  - Prefer iteration and modularization over code duplication.
-  - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
-  - Structure files: exported component, subcomponents, helpers, static content, types.
-  
-  Naming Conventions
-  - Use lowercase with dashes for directories (e.g., components/auth-wizard).
-  - Favor named exports for components.
-  
-  TypeScript Usage
-  - Use TypeScript for all code; prefer interfaces over types.
-  - Avoid enums; use maps instead.
-  - Use functional components with TypeScript interfaces.
-  
-  Syntax and Formatting
-  - Use the "function" keyword for pure functions.
-  - Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
-  - Use declarative JSX.
-  
-  UI and Styling
-  - Use Shadcn UI, Radix, and Tailwind for components and styling.
-  - Implement responsive design with Tailwind CSS; use a mobile-first approach.
-  
-  Performance Optimization
-  - Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC).
-  - Wrap client components in Suspense with fallback.
-  - Use dynamic loading for non-critical components.
-  - Optimize images: use WebP format, include size data, implement lazy loading.
-  
-  Key Conventions
-  - Use 'nuqs' for URL search parameter state management.
-  - Optimize Web Vitals (LCP, CLS, FID).
-  - Limit 'use client':
-    - Favor server components and Next.js SSR.
-    - Use only for Web API access in small components.
-    - Avoid for data fetching or state management.
-  
-  Follow Next.js docs for Data Fetching, Rendering, and Routing.
+Below is a comprehensive rules file tailored for your Next.js 15 property management web application, using the RSC + API approach we’ve finalized. This file is designed to ensure consistency, clarity, and smooth collaboration for anyone working on the project. I’ll include vital information to keep the project running smoothly, incorporate key decisions we’ve made (e.g., RSC preference, role-based structure), and add important planning details. You can use this directly in your Cursor rules file or adapt it as needed.
+
+---
+
+### Property Management Web Application Rules
+
+#### Project Overview
+This is a Next.js 15 web application for property management, supporting three user roles:
+- **Renter**: Views and applies for properties.
+- **Landlord**: Manages their own properties (e.g., listings, payments).
+- **Property Management**: Manages multiple properties for landlords (e.g., tenants, maintenance, payments).
+
+The app uses React Server Components (RSC) as the primary data-fetching and rendering mechanism, supplemented by API routes for specific use cases (e.g., external integrations, client-side interactivity). The database is PostgreSQL, accessed via Drizzle ORM.
+
+---
+
+### Directory Structure
+The project follows this route layout in the `app` directory:
+
+```
+app/
+├── (public)/                  # Publicly accessible routes
+│   ├── properties/           # Public property listings
+│   │   ├── page.tsx         # RSC: List all available properties
+│   │   └── [id]/            # Dynamic route for property details
+│   │       └── page.tsx     # RSC: Fetch specific property
+│   ├── login/
+│   │   └── page.tsx         # RSC: Handle login
+│   ├── register/
+│   │   └── page.tsx         # RSC: Handle registration
+│   └── layout.tsx           # Public layout (server-rendered)
+├── (dashboard)/              # Authenticated routes
+│   ├── layout.tsx           # RSC: Shared layout with role-based navigation
+│   ├── dashboard/
+│   │   └── page.tsx         # RSC: Role-specific dashboard
+│   ├── properties/
+│   │   ├── layout.tsx       # RSC: Property-specific navigation
+│   │   ├── page.tsx         # RSC: List properties (filtered by role)
+│   │   ├── [id]/            # Dynamic route for property
+│   │   │   ├── page.tsx     # RSC: Property details
+│   │   │   ├── edit/
+│   │   │   │   └── page.tsx # RSC: Edit property form
+│   │   │   └── tenants/
+│   │   │       └── page.tsx # RSC: Tenant details (Property Management only)
+│   │   └── new/
+│   │       └── page.tsx     # RSC: New property form
+│   ├── tenants/
+│   │   └── page.tsx         # RSC: Tenant management (Property Management only)
+│   ├── payments/
+│   │   └── page.tsx         # RSC: Payment management (role-specific)
+│   ├── maintenance/
+│   │   └── page.tsx         # RSC: Maintenance management
+│   ├── applications/
+│   │   └── page.tsx         # RSC: Renter applications
+│   └── saved/
+│       └── page.tsx         # RSC: Renter saved properties
+├── api/                      # API routes (used sparingly)
+│   ├── properties/
+│   │   ├── route.ts         # GET/POST: Property CRUD
+│   │   └── [id]/
+│   │       └── route.ts     # GET/PUT/DELETE: Specific property
+│   ├── payments/
+│   │   └── route.ts         # POST: Payment processing
+│   └── tenants/
+│       └── route.ts         # GET/POST: Tenant management
+├── layout.tsx                # Root layout (server-rendered)
+├── page.tsx                  # Landing page (RSC)
+└── middleware.ts             # Auth and role-based routing
+```
+
+---
+
+### Core Rules
+
+#### 1. React Server Components (RSC) as Default
+- **Rule**: Use RSC for all data fetching and rendering unless client-side interactivity or external integrations require otherwise.
+- **Why**: RSC simplifies the architecture, improves performance, and aligns with Next.js 15’s strengths.
+- **Implementation**:
+  - Fetch data directly from the database (Drizzle ORM) in `page.tsx` or `layout.tsx`.
+  - Example: `app/(public)/properties/page.tsx` fetches available properties server-side.
+- **Exception**: Use client components (marked with `"use client"`) for interactive UI (e.g., forms with real-time validation).
+
+#### 2. Server Actions for Mutations
+- **Rule**: Use Server Actions for form submissions and data mutations instead of API routes where possible.
+- **Why**: Keeps logic server-side, integrates with RSC, and avoids extra endpoints.
+- **Implementation**:
+  - Add `'use server'` directive in a function within a server component.
+  - Example: `app/(dashboard)/properties/new/page.tsx` uses a `createProperty` action to insert a new property.
+- **Syntax**:
+  ```tsx
+  'use server';
+  import { db } from '@/db';
+  import { property } from '@/schema';
+
+  export async function createProperty(formData: FormData) {
+    const title = formData.get('title') as string;
+    await db.insert(property).values({ title, /* ... */ });
+  }
+  ```
+
+#### 3. API Routes Usage
+- **Rule**: Use API routes only for:
+  1. External integrations (e.g., payment gateways, mobile apps).
+  2. Client-side interactivity requiring separate endpoints (e.g., real-time updates).
+- **Why**: RSC handles most internal needs; API routes add complexity unless necessary.
+- **Implementation**:
+  - Example: `app/api/payments/route.ts` for Stripe webhook integration.
+  - Keep API routes RESTful (GET, ascended to **GET**, **POST**, **PUT**, **DELETE**).
+- **Guideline**: If it’s internal and server-side, use RSC or Server Actions instead.
+
+#### 4. Authentication and Authorization
+- **Rule**: Use NextAuth.js for authentication, with role-based access control (RBAC) enforced via middleware and page logic.
+- **Why**: Simplifies auth setup and integrates with RSC.
+- **Implementation**:
+  - Store roles (`renter`, `landlord`, `property-manager`) in the `user` table and session.
+  - Use `middleware.ts` to protect `(dashboard)` routes and redirect based on role.
+  - Example: Restrict `/tenants` to `property-manager` role.
+- **Middleware Example**:
+  ```tsx
+  import { NextResponse } from 'next/server';
+  import { getServerSession } from 'next-auth';
+
+  export async function middleware(request: Request) {
+    const session = await getServerSession();
+    const { pathname } = new URL(request.url);
+
+    if (!session && pathname.startsWith('/dashboard')) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    if (session && pathname === '/dashboard') {
+      return NextResponse.redirect(new URL(`/dashboard?role=${session.user.role}`, request.url));
+    }
+
+    return NextResponse.next();
+  }
+
+  export const config = { matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'] };
+  ```
+
+#### 5. Database Access
+- **Rule**: Use Drizzle ORM for all database interactions, defined in `schema.ts`.
+- **Why**: Type-safe, lightweight, and integrates with RSC.
+- **Implementation**:
+  - Import `db` and schema tables (e.g., `property`, `user`) in server components.
+  - Example: `await db.select().from(property).where(eq(property.isAvailable, true))`.
+- **Location**: Store schema in `src/db/schema.ts` and database connection in `src/db/index.ts`.
+
+#### 6. Role-Based Logic
+- **Rule**: Filter content and navigation based on user role (`renter`, `landlord`, `property-manager`).
+- **Why**: Ensures each role sees only relevant features.
+- **Implementation**:
+  - In layouts: Conditionally render navigation (e.g., `tenants` for `property-manager` only).
+  - In pages: Filter data (e.g., Landlords see only their properties via `ownerId`).
+
+#### 7. File Naming and Organization
+- **Rule**: Follow Next.js App Router conventions:
+  - `page.tsx`: Main page content (RSC).
+  - `layout.tsx`: Shared UI for a route group.
+  - `[id]`: Dynamic routes for specific resources.
+- **Why**: Keeps routing predictable and maintainable.
+- **Guideline**: Use nested layouts (e.g., `(dashboard)/properties/layout.tsx`) for sub-navigation.
+
+#### 8. Error Handling
+- **Rule**: Include `not-found.tsx` and `error.tsx` in `(public)` and `(dashboard)` directories.
+- **Why**: Improves user experience for 404s and errors.
+- **Implementation**:
+  - `not-found.tsx`: Custom “Page Not Found” message.
+  - `error.tsx`: Generic error boundary with retry option.
+
+#### 9. Styling
+- **Rule**: Use Tailwind CSS for styling, with reusable components in `src/components/`.
+- **Why**: Fast, consistent, and scalable styling.
+- **Implementation**:
+  - Configure in `tailwind.config.js`.
+  - Example: `<div className="p-6 bg-white rounded shadow">`.
+
+#### 10. Testing and Deployment
+- **Rule**: Test with Jest and React Testing Library; deploy via Vercel.
+- **Why**: Ensures reliability and leverages Next.js ecosystem.
+- **Implementation**:
+  - Test RSC with `render` and `screen` from RTL.
+  - Use `drizzle-kit` for migrations: `npx drizzle-kit push:pg`.
+
+---
+
+### Important Planning Information
+
+#### Roles and Permissions
+- **Renter**: Can view properties, apply, save favorites, and manage applications.
+- **Landlord**: Manages their own properties (CRUD), views payments, and handles maintenance for their properties.
+- **Property Management**: Manages multiple properties, tenants, payments, and maintenance for landlords.
+- **RBAC**: Enforced via `user_role` table and middleware.
+
+#### Key Features
+- **Public Listings**: `/properties` and `/properties/[id]` are accessible without login.
+- **Dashboard**: Role-specific views under `(dashboard)`.
+- **Property Management**: CRUD operations, tenant assignment, and maintenance tracking.
+- **Payments**: Track rent payments with statuses (`pending`, `paid`, `late`).
+- **Maintenance**: Tickets with statuses (`open`, `in_progress`, `resolved`).
+
+#### Database Schema
+- Defined in `src/db/schema.ts` (see previous responses for full schema).
+- Key tables: `user`, `property`, `rent_payments`, `maintenance_tickets`, `user_role`.
+- Use enums (e.g., `property_status`, `payment_status`) for consistency.
+
+#### Authentication
+- NextAuth.js with email/password and OAuth providers (e.g., Google).
+- Session includes `user.id`, `user.role`, and `user.email`.
+
+#### Future Considerations
+- **Mobile App**: Plan for API routes if a mobile app is added (e.g., `/api/properties`).
+- **Real-Time**: Add WebSockets (e.g., via Pusher) for notifications if needed.
+- **Analytics**: Expand `usage_analytics` and `property_performance_reports` for detailed insights.
+
+---
+
+### Best Practices
+1. **Commit Messages**: Use semantic commits (e.g., `feat: add property listing page`, `fix: correct role filter`).
+2. **Code Review**: Require PRs with at least one approval.
+3. **Documentation**: Update this rules file with major changes.
+4. **Performance**: Use Next.js caching (e.g., `revalidatePath`) for frequently accessed data.
+5. **Security**: Sanitize inputs in Server Actions; use environment variables for secrets (e.g., `DATABASE_URL`).
+
+---
+
+### Example Workflow
+1. **Renter Applies for Property**:
+   - Views `/properties/[id]` (RSC).
+   - Submits application via Server Action in `applications/page.tsx`.
+   - Landlord/Property Manager sees it in `/applications`.
+
+2. **Landlord Adds Property**:
+   - Navigates to `/properties/new` (RSC).
+   - Submits form via Server Action.
+   - Property appears in `/properties`.
+
+3. **Property Manager Manages Tenants**:
+   - Views `/properties/[id]/tenants` (RSC).
+   - Updates tenant data via Server Action.
+
+---
+
+This rules file ensures anyone can onboard quickly, follow consistent practices, and understand the project’s direction. Copy it into your Cursor rules file (e.g., `.cursorrules`) or a `README.md` for team use. Let me know if you need adjustments or additional details!
