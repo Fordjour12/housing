@@ -1,11 +1,11 @@
-import { pgTable, serial, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
 
 /** Saved searches table for storing user's saved property search criteria */
 export const savedSearches = pgTable("saved_searches", {
-	id: serial("id").primaryKey(),
-	userId: serial("user_id")
+	id: text("id").primaryKey(),
+	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	searchCriteria: jsonb("search_criteria").notNull(),

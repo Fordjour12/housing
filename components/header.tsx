@@ -13,9 +13,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { NotificationSheet } from "@/components/notification-sheet";
-import { useNotifications } from "@/context/notifications-context";
-import SignOut from "@/actions/client/signout";
+// import { NotificationSheet } from "@/components/notification-sheet";
+// import { useNotifications } from "@/context/notifications-context";
+// import SignOut from "@/actions/client/signout";
 
 interface HeaderProps {
 	user?: {
@@ -27,10 +27,12 @@ interface HeaderProps {
 
 export default function Header({ user }: HeaderProps) {
 	// Get unread message count from the notifications context
+	/*
 	const { notifications } = useNotifications();
 	const unreadMessageCount = notifications.filter(
 		(n) => n.type === "message" && !n.isRead,
 	).length;
+	*/
 
 	return (
 		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -89,7 +91,7 @@ export default function Header({ user }: HeaderProps) {
 				<div className="flex items-center gap-4">
 					{user ? (
 						<>
-							<Link href="/messages" className="relative">
+							{/* <Link href="/messages" className="relative">
 								<MessageSquare className="h-5 w-5" />
 								{unreadMessageCount > 0 && (
 									<Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0">
@@ -99,7 +101,7 @@ export default function Header({ user }: HeaderProps) {
 								<span className="sr-only">Messages</span>
 							</Link>
 
-							<NotificationSheet />
+							<NotificationSheet /> */}
 
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
@@ -136,7 +138,8 @@ export default function Header({ user }: HeaderProps) {
 									<DropdownMenuItem>Settings</DropdownMenuItem>
 									<DropdownMenuSeparator />
 									<DropdownMenuItem asChild>
-										<SignOut />
+										{/* <SignOut /> */}
+										Login
 									</DropdownMenuItem>
 								</DropdownMenuContent>
 							</DropdownMenu>

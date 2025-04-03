@@ -1,3 +1,4 @@
+/*
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
@@ -139,4 +140,6 @@ export const useNotifications = () => {
   }
   return context
 }
+
+*/
 

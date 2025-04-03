@@ -19,12 +19,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useUser } from "@/context/user-context";
+// import { useUser } from "@/context/user-context";
 import { toast } from "sonner";
 
 export default function LoginForm() {
 	const [isLoading, setIsLoading] = useState(false);
-	const { login } = useUser();
+	// const { login } = useUser();
 	const form = useForm<z.infer<LoginSchema>>({
 		resolver: zodResolver(loginSchema),
 		resetOptions: {
@@ -41,13 +41,21 @@ export default function LoginForm() {
 	async function onSubmit(values: z.infer<LoginSchema>) {
 		try {
 			setIsLoading(true);
-			const result = await login(values.email, values.password);
+			const response = await fetch("/api/auth/login", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(values),
+			});
 
-			if (result.success) {
+			const data = await response.json();
+
+			if (response.ok) {
 				toast.success("Login successful");
 				router.push("/listings");
 			} else {
-				toast.error(result.error || "Failed to login. Please try again.");
+				toast.error(data.error || "Failed to login. Please try again.");
 			}
 		} catch (error) {
 			console.error("Login error:", error);

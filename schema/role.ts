@@ -1,10 +1,10 @@
-import { pgTable, serial, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { userRole } from "./userRole";
 
 /** Role table for storing user roles and permissions */
 export const role = pgTable("role", {
-	id: serial("id").primaryKey(),
+	id: text("id").primaryKey(),
 	name: text("name").notNull(),
 	description: text("description"),
 	canCreateListings: boolean("can_create_listings").default(false).notNull(),

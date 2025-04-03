@@ -19,11 +19,9 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useUser } from "@/context/user-context";
 
 export default function RegisterForm() {
 	const [isLoading, setIsLoading] = useState(false);
-	const { register } = useUser();
 	const form = useForm<z.infer<RegisterSchema>>({
 		resolver: zodResolver(registerSchema),
 		resetOptions: {
@@ -42,19 +40,22 @@ export default function RegisterForm() {
 	async function onSubmit(values: z.infer<typeof registerSchema>) {
 		try {
 			setIsLoading(true);
-			const result = await register(
-				values.email,
-				values.password,
-				values.firstName,
-				values.lastName,
-			);
+			const response = await fetch("/api/auth/register", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(values),
+			});
 
-			if (result.success) {
+			const data = await response.json();
+
+			if (response.ok) {
 				toast.success("Account created successfully");
 				router.push("/listings");
 			} else {
 				toast.error(
-					result.error || "Failed to create account. Please try again.",
+					data.error || "Failed to create account. Please try again.",
 				);
 			}
 		} catch (error) {
