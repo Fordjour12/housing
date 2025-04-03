@@ -4,10 +4,6 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
 	try {
 		const { email, password, firstName, lastName } = await req.json();
-		console.log("email", email);
-		console.log("password", password);
-		console.log("firstName", firstName);
-		console.log("lastName", lastName);
 
 		const result = await auth.api.signUpEmail({
 			body: {
