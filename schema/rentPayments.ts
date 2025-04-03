@@ -1,6 +1,6 @@
 import {
 	pgTable,
-	serial,
+	text,
 	timestamp,
 	date,
 	numeric,
@@ -15,15 +15,16 @@ export const paymentStatusEnum = pgEnum("payment_status", [
 	"pending",
 	"paid",
 	"late",
+	"failed",
 ]);
 
 /** Rent payments table for tracking property rent payments */
 export const rentPayments = pgTable("rent_payments", {
-	id: serial("id").primaryKey(),
-	tenantId: serial("tenant_id")
+	id: text("id").primaryKey(),
+	tenantId: text("tenant_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
-	propertyId: serial("property_id")
+	propertyId: text("property_id")
 		.notNull()
 		.references(() => property.id, { onDelete: "cascade" }),
 	amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),

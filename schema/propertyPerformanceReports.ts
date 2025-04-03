@@ -1,4 +1,4 @@
-import { pgTable, serial, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { property } from "./property";
 
@@ -6,8 +6,8 @@ import { property } from "./property";
 export const propertyPerformanceReports = pgTable(
 	"property_performance_reports",
 	{
-		id: serial("id").primaryKey(),
-		propertyId: serial("property_id")
+		id: text("id").primaryKey(),
+		propertyId: text("property_id")
 			.notNull()
 			.references(() => property.id, { onDelete: "cascade" }),
 		reportData: jsonb("report_data").notNull(),

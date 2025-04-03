@@ -1,11 +1,11 @@
-import { pgTable, serial, timestamp, date } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, date } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { property } from "./property";
 
 /** Property availability table for tracking property availability periods */
 export const propertyAvailability = pgTable("property_availability", {
-	id: serial("id").primaryKey(),
-	propertyId: serial("property_id")
+	id: text("id").primaryKey(),
+	propertyId: text("property_id")
 		.notNull()
 		.references(() => property.id, { onDelete: "cascade" }),
 	availableFrom: date("available_from").notNull(),
