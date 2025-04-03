@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { propertyManagerFirm } from "./propertyManagerFirm";
 import { user } from "./user";
@@ -6,11 +6,11 @@ import { propertyAssignment } from "./propertyAssignment";
 
 /** Team member table for storing property management team members */
 export const teamMember = pgTable("team_member", {
-	id: serial("id").primaryKey(),
-	firmId: serial("firm_id")
+	id: text("id").primaryKey(),
+	firmId: text("firm_id")
 		.notNull()
 		.references(() => propertyManagerFirm.id, { onDelete: "cascade" }),
-	userId: serial("user_id")
+	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	role: text("role").notNull(),

@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { account } from "./account";
 import { session } from "./session";
@@ -19,12 +19,14 @@ import { propertyManagerFirm } from "./propertyManagerFirm";
 
 /** User table for storing user information */
 export const user = pgTable("user", {
-	id: serial("id").primaryKey(),
+	id: text("id").primaryKey(),
 	name: text("name").notNull(),
 	email: text("email").notNull().unique(),
 	emailVerified: boolean("email_verified").notNull(),
 	image: text("image"),
 	onboardingCompleted: boolean("onboarding_completed").default(false),
+	// resetToken: text("reset_token"),
+	// resetTokenExpiry: timestamp("reset_token_expiry"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

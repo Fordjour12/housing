@@ -1,8 +1,8 @@
 CREATE TYPE "public"."property_status" AS ENUM('active', 'pending', 'inactive');--> statement-breakpoint
 CREATE TYPE "public"."maintenance_status" AS ENUM('open', 'in_progress', 'resolved');--> statement-breakpoint
-CREATE TYPE "public"."payment_status" AS ENUM('pending', 'paid', 'late');--> statement-breakpoint
+CREATE TYPE "public"."payment_status" AS ENUM('pending', 'paid', 'late', 'failed');--> statement-breakpoint
 CREATE TABLE "user" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
 	"email_verified" boolean NOT NULL,
@@ -14,10 +14,10 @@ CREATE TABLE "user" (
 );
 --> statement-breakpoint
 CREATE TABLE "account" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
-	"user_id" serial NOT NULL,
+	"user_id" text NOT NULL,
 	"access_token" text,
 	"refresh_token" text,
 	"id_token" text,
@@ -30,19 +30,19 @@ CREATE TABLE "account" (
 );
 --> statement-breakpoint
 CREATE TABLE "session" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"expires_at" timestamp NOT NULL,
 	"token" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"ip_address" text,
 	"user_agent" text,
-	"user_id" serial NOT NULL,
+	"user_id" text NOT NULL,
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
 CREATE TABLE "role" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
 	"can_create_listings" boolean DEFAULT false NOT NULL,
@@ -57,14 +57,14 @@ CREATE TABLE "role" (
 );
 --> statement-breakpoint
 CREATE TABLE "user_role" (
-	"user_id" serial NOT NULL,
-	"role_id" serial NOT NULL,
+	"user_id" text NOT NULL,
+	"role_id" text NOT NULL,
 	"assigned_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "user_role_user_id_role_id_pk" PRIMARY KEY("user_id","role_id")
 );
 --> statement-breakpoint
 CREATE TABLE "property" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"title" text NOT NULL,
 	"description" text NOT NULL,
 	"street_address" text NOT NULL,
@@ -93,16 +93,16 @@ CREATE TABLE "property" (
 	"photos" text[],
 	"is_available" boolean DEFAULT true NOT NULL,
 	"status" "property_status" DEFAULT 'pending' NOT NULL,
-	"owner_id" serial NOT NULL,
-	"property_manager_id" serial NOT NULL,
+	"owner_id" text NOT NULL,
+	"property_manager_id" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "maintenance_tickets" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"property_id" serial NOT NULL,
-	"tenant_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"property_id" text NOT NULL,
+	"tenant_id" text NOT NULL,
 	"issue_description" text NOT NULL,
 	"status" "maintenance_status" DEFAULT 'open' NOT NULL,
 	"resolution" text,
@@ -120,23 +120,23 @@ CREATE TABLE "verification" (
 );
 --> statement-breakpoint
 CREATE TABLE "favorite" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" serial NOT NULL,
-	"property_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"property_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "property_assignment" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"property_id" serial NOT NULL,
-	"team_member_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"property_id" text NOT NULL,
+	"team_member_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "property_manager_firm" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
 	"business_name" text NOT NULL,
 	"street_address" text NOT NULL,
 	"unit_number" text,
@@ -162,32 +162,32 @@ CREATE TABLE "property_manager_firm" (
 );
 --> statement-breakpoint
 CREATE TABLE "team_member" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"firm_id" serial NOT NULL,
-	"user_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"firm_id" text NOT NULL,
+	"user_id" text NOT NULL,
 	"role" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "search_history" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
 	"search_query" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "saved_searches" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
 	"search_criteria" jsonb NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "lease_agreements" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"property_id" serial NOT NULL,
-	"tenant_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"property_id" text NOT NULL,
+	"tenant_id" text NOT NULL,
 	"start_date" date NOT NULL,
 	"end_date" date NOT NULL,
 	"terms" text NOT NULL,
@@ -196,9 +196,9 @@ CREATE TABLE "lease_agreements" (
 );
 --> statement-breakpoint
 CREATE TABLE "tenant_feedback" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"tenant_id" serial NOT NULL,
-	"property_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"tenant_id" text NOT NULL,
+	"property_id" text NOT NULL,
 	"feedback" text NOT NULL,
 	"rating" integer NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -206,9 +206,9 @@ CREATE TABLE "tenant_feedback" (
 );
 --> statement-breakpoint
 CREATE TABLE "rent_payments" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"tenant_id" serial NOT NULL,
-	"property_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"tenant_id" text NOT NULL,
+	"property_id" text NOT NULL,
 	"amount" numeric(10, 2) NOT NULL,
 	"due_date" date NOT NULL,
 	"payment_date" date,
@@ -217,46 +217,46 @@ CREATE TABLE "rent_payments" (
 );
 --> statement-breakpoint
 CREATE TABLE "messages" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"sender_id" serial NOT NULL,
-	"receiver_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"sender_id" text NOT NULL,
+	"receiver_id" text NOT NULL,
 	"content" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "notification_preferences" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
 	"email_notifications" boolean DEFAULT true NOT NULL,
 	"sms_notifications" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "property_availability" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"property_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"property_id" text NOT NULL,
 	"available_from" date NOT NULL,
 	"available_to" date,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "usage_analytics" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
 	"action" text NOT NULL,
 	"timestamp" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "property_performance_reports" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"property_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"property_id" text NOT NULL,
 	"report_data" jsonb NOT NULL,
 	"generated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "security_logs" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" serial NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
 	"action" text NOT NULL,
 	"timestamp" timestamp DEFAULT now() NOT NULL
 );

@@ -151,7 +151,8 @@ export default async function LandingPage() {
 								>
 									<div className="relative h-48">
 										<Image
-											src={`/placeholder.svg?height=400&width=600&text=Property ${i}`}
+											// src={`/placeholder.svg?height=400&width=600&text=Property ${i}`}
+											src="/housing-2.jpg"
 											alt={`Property ${i}`}
 											fill
 											className="object-cover"

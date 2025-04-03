@@ -1,12 +1,12 @@
-import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
 import { teamMember } from "./teamMember";
 
 /** Property manager firm table for storing property management companies */
 export const propertyManagerFirm = pgTable("property_manager_firm", {
-	id: serial("id").primaryKey(),
-	userId: serial("user_id")
+	id: text("id").primaryKey(),
+	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	businessName: text("business_name").notNull(),

@@ -1,14 +1,14 @@
-import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
 
 /** Messages table for storing user-to-user messages */
 export const messages = pgTable("messages", {
-	id: serial("id").primaryKey(),
-	senderId: serial("sender_id")
+	id: text("id").primaryKey(),
+	senderId: text("sender_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
-	receiverId: serial("receiver_id")
+	receiverId: text("receiver_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	content: text("content").notNull(),
