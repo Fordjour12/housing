@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Heart, MapPin, Save, Search } from "lucide-react";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { geocodeAddress } from "@/app/services/geocoding";
+import { geocodeAddress } from "@/app/protected/services/geocoding";
 
 interface AdvancedSearchProps {
 	onSearch: (criteria: SearchCriteria) => void;

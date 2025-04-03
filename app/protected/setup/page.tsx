@@ -1,5 +1,5 @@
 import Header from "@/components/header"
-import EnvSetup from "@/app/env-setup"
+import EnvSetup from "@/app/protected/env-setup"
 
 export default function SetupPage() {
   return (
