@@ -1,6 +1,6 @@
 "use client";
 
-import { DataTable } from "@/app/protected/prty-man/listings/data-table";
+import { DataTable } from "@/protected/prty-man/listings/data-table";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
@@ -33,10 +33,7 @@ const columns = [
 		accessorKey: "status",
 		header: "Status",
 		cell: ({ row }: { row: { original: Listing } }) => {
-			return (
-				row.original.status.charAt(0).toUpperCase() +
-				row.original.status.slice(1)
-			);
+			return row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1);
 		},
 	},
 	{
@@ -77,9 +74,7 @@ export default function ListingsPage() {
 				const { data } = await getListings();
 				setListings(data ?? []);
 			} catch (err) {
-				setError(
-					err instanceof Error ? err.message : "Failed to fetch listings",
-				);
+				setError(err instanceof Error ? err.message : "Failed to fetch listings");
 			}
 		};
 
@@ -108,9 +103,7 @@ export default function ListingsPage() {
 					</Link>
 					<div>
 						<h1 className="text-2xl font-semibold">Listings</h1>
-						<p className="text-sm text-muted-foreground">
-							Manage your property listings
-						</p>
+						<p className="text-sm text-muted-foreground">Manage your property listings</p>
 					</div>
 				</div>
 				<Link href="/prty-man/listings/new">

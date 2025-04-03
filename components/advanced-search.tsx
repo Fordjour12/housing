@@ -2,19 +2,13 @@ import type { SavedSearch, SearchCriteria } from "@/types/search";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Heart, MapPin, Save, Search } from "lucide-react";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { geocodeAddress } from "@/app/protected/services/geocoding";
+import { geocodeAddress } from "@/protected/services/geocoding";
 
 interface AdvancedSearchProps {
 	onSearch: (criteria: SearchCriteria) => void;
@@ -25,19 +19,9 @@ interface AdvancedSearchProps {
 type PetType = "dogs" | "cats" | "other";
 type ParkingType = "covered" | "garage" | "street" | "none";
 type UtilityType = "water" | "electricity" | "gas" | "internet" | "trash";
-type AccessibilityFeature =
-	| "wheelchair"
-	| "elevator"
-	| "ground-floor"
-	| "step-free";
+type AccessibilityFeature = "wheelchair" | "elevator" | "ground-floor" | "step-free";
 type SmokingPolicyType = "allowed" | "outside-only" | "not-allowed";
-type POIType =
-	| "restaurant"
-	| "grocery"
-	| "park"
-	| "school"
-	| "transit"
-	| "hospital";
+type POIType = "restaurant" | "grocery" | "park" | "school" | "transit" | "hospital";
 type AmenityType =
 	| "in-unit-laundry"
 	| "dishwasher"
@@ -49,11 +33,7 @@ type AmenityType =
 	| "air-conditioning"
 	| "heating";
 
-export default function AdvancedSearch({
-	onSearch,
-	onSaveSearch,
-	savedSearches = [],
-}: AdvancedSearchProps) {
+export default function AdvancedSearch({ onSearch, onSaveSearch, savedSearches = [] }: AdvancedSearchProps) {
 	const [searchCriteria, setSearchCriteria] = useState<SearchCriteria>({
 		location: {
 			address: "",
@@ -75,9 +55,7 @@ export default function AdvancedSearch({
 	const [showPOISearch, setShowPOISearch] = useState(false);
 	const [searchName, setSearchName] = useState("");
 	const [emailNotifications, setEmailNotifications] = useState(true);
-	const [drawingMode, setDrawingMode] = useState<"none" | "circle" | "polygon">(
-		"none",
-	);
+	const [drawingMode, setDrawingMode] = useState<"none" | "circle" | "polygon">("none");
 
 	const handleSearch = () => {
 		onSearch(searchCriteria);
@@ -105,9 +83,7 @@ export default function AdvancedSearch({
 			<div className="flex-1 overflow-y-auto px-4">
 				<div className="sticky top-0 bg-background pt-4 pb-2 z-10">
 					<h2 className="text-lg font-semibold">Advanced Search</h2>
-					<p className="text-sm text-muted-foreground">
-						Use advanced filters to find your perfect rental
-					</p>
+					<p className="text-sm text-muted-foreground">Use advanced filters to find your perfect rental</p>
 				</div>
 
 				<div className="space-y-4">
@@ -156,12 +132,7 @@ export default function AdvancedSearch({
 										))}
 									</SelectContent>
 								</Select>
-								<Button
-									variant="outline"
-									onClick={() =>
-										setDrawingMode(drawingMode === "none" ? "polygon" : "none")
-									}
-								>
+								<Button variant="outline" onClick={() => setDrawingMode(drawingMode === "none" ? "polygon" : "none")}>
 									Draw Area
 								</Button>
 							</div>
@@ -247,28 +218,20 @@ export default function AdvancedSearch({
 											{["dogs", "cats", "other"].map((type) => (
 												<div key={type} className="flex items-center space-x-2">
 													<Checkbox
-														checked={searchCriteria.petPolicy?.types?.includes(
-															type as PetType,
-														)}
+														checked={searchCriteria.petPolicy?.types?.includes(type as PetType)}
 														onCheckedChange={(checked) => {
-															const types =
-																searchCriteria.petPolicy?.types || [];
+															const types = searchCriteria.petPolicy?.types || [];
 															setSearchCriteria({
 																...searchCriteria,
 																petPolicy: {
 																	...searchCriteria.petPolicy,
-																	allowed:
-																		searchCriteria.petPolicy?.allowed || false,
-																	types: checked
-																		? [...types, type as PetType]
-																		: types.filter((t) => t !== type),
+																	allowed: searchCriteria.petPolicy?.allowed || false,
+																	types: checked ? [...types, type as PetType] : types.filter((t) => t !== type),
 																},
 															});
 														}}
 													/>
-													<Label>
-														{type.charAt(0).toUpperCase() + type.slice(1)}
-													</Label>
+													<Label>{type.charAt(0).toUpperCase() + type.slice(1)}</Label>
 												</div>
 											))}
 										</div>
@@ -302,18 +265,14 @@ export default function AdvancedSearch({
 											const amenities = searchCriteria.amenities || [];
 											setSearchCriteria({
 												...searchCriteria,
-												amenities: checked
-													? [...amenities, amenity]
-													: amenities.filter((a) => a !== amenity),
+												amenities: checked ? [...amenities, amenity] : amenities.filter((a) => a !== amenity),
 											});
 										}}
 									/>
 									<Label>
 										{amenity
 											.split("-")
-											.map(
-												(word) => word.charAt(0).toUpperCase() + word.slice(1),
-											)
+											.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 											.join(" ")}
 									</Label>
 								</div>
@@ -328,16 +287,12 @@ export default function AdvancedSearch({
 							{["covered", "garage", "street", "none"].map((type) => (
 								<div key={type} className="flex items-center space-x-2">
 									<Checkbox
-										checked={searchCriteria.parking?.includes(
-											type as ParkingType,
-										)}
+										checked={searchCriteria.parking?.includes(type as ParkingType)}
 										onCheckedChange={(checked) => {
 											const parking = searchCriteria.parking || [];
 											setSearchCriteria({
 												...searchCriteria,
-												parking: checked
-													? [...parking, type as ParkingType]
-													: parking.filter((p) => p !== type),
+												parking: checked ? [...parking, type as ParkingType] : parking.filter((p) => p !== type),
 											});
 										}}
 									/>
@@ -351,29 +306,23 @@ export default function AdvancedSearch({
 					<div className="space-y-2">
 						<Label>Utilities Included</Label>
 						<div className="grid grid-cols-2 gap-2">
-							{["water", "electricity", "gas", "internet", "trash"].map(
-								(utility) => (
-									<div key={utility} className="flex items-center space-x-2">
-										<Checkbox
-											checked={searchCriteria.utilities?.includes(
-												utility as UtilityType,
-											)}
-											onCheckedChange={(checked) => {
-												const utilities = searchCriteria.utilities || [];
-												setSearchCriteria({
-													...searchCriteria,
-													utilities: checked
-														? [...utilities, utility as UtilityType]
-														: utilities.filter((u) => u !== utility),
-												});
-											}}
-										/>
-										<Label>
-											{utility.charAt(0).toUpperCase() + utility.slice(1)}
-										</Label>
-									</div>
-								),
-							)}
+							{["water", "electricity", "gas", "internet", "trash"].map((utility) => (
+								<div key={utility} className="flex items-center space-x-2">
+									<Checkbox
+										checked={searchCriteria.utilities?.includes(utility as UtilityType)}
+										onCheckedChange={(checked) => {
+											const utilities = searchCriteria.utilities || [];
+											setSearchCriteria({
+												...searchCriteria,
+												utilities: checked
+													? [...utilities, utility as UtilityType]
+													: utilities.filter((u) => u !== utility),
+											});
+										}}
+									/>
+									<Label>{utility.charAt(0).toUpperCase() + utility.slice(1)}</Label>
+								</div>
+							))}
 						</div>
 					</div>
 
@@ -381,35 +330,28 @@ export default function AdvancedSearch({
 					<div className="space-y-2">
 						<Label>Accessibility Features</Label>
 						<div className="grid grid-cols-2 gap-2">
-							{["wheelchair", "elevator", "ground-floor", "step-free"].map(
-								(feature) => (
-									<div key={feature} className="flex items-center space-x-2">
-										<Checkbox
-											checked={searchCriteria.accessibility?.includes(
-												feature as AccessibilityFeature,
-											)}
-											onCheckedChange={(checked) => {
-												const features = searchCriteria.accessibility || [];
-												setSearchCriteria({
-													...searchCriteria,
-													accessibility: checked
-														? [...features, feature as AccessibilityFeature]
-														: features.filter((f) => f !== feature),
-												});
-											}}
-										/>
-										<Label>
-											{feature
-												.split("-")
-												.map(
-													(word) =>
-														word.charAt(0).toUpperCase() + word.slice(1),
-												)
-												.join(" ")}
-										</Label>
-									</div>
-								),
-							)}
+							{["wheelchair", "elevator", "ground-floor", "step-free"].map((feature) => (
+								<div key={feature} className="flex items-center space-x-2">
+									<Checkbox
+										checked={searchCriteria.accessibility?.includes(feature as AccessibilityFeature)}
+										onCheckedChange={(checked) => {
+											const features = searchCriteria.accessibility || [];
+											setSearchCriteria({
+												...searchCriteria,
+												accessibility: checked
+													? [...features, feature as AccessibilityFeature]
+													: features.filter((f) => f !== feature),
+											});
+										}}
+									/>
+									<Label>
+										{feature
+											.split("-")
+											.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+											.join(" ")}
+									</Label>
+								</div>
+							))}
 						</div>
 					</div>
 
@@ -440,34 +382,20 @@ export default function AdvancedSearch({
 					<div className="space-y-2">
 						<div className="flex items-center justify-between">
 							<Label>Points of Interest</Label>
-							<Switch
-								checked={showPOISearch}
-								onCheckedChange={setShowPOISearch}
-							/>
+							<Switch checked={showPOISearch} onCheckedChange={setShowPOISearch} />
 						</div>
 						{showPOISearch && (
 							<div className="grid gap-4">
-								{[
-									"restaurant",
-									"grocery",
-									"park",
-									"school",
-									"transit",
-									"hospital",
-								].map((type) => (
+								{["restaurant", "grocery", "park", "school", "transit", "hospital"].map((type) => (
 									<div key={type} className="grid grid-cols-2 gap-4">
-										<Label className="flex items-center">
-											{type.charAt(0).toUpperCase() + type.slice(1)}
-										</Label>
+										<Label className="flex items-center">{type.charAt(0).toUpperCase() + type.slice(1)}</Label>
 										<Select
 											value={searchCriteria.pointsOfInterest
 												?.find((poi) => poi.type === (type as POIType))
 												?.maxDistance.toString()}
 											onValueChange={(value) => {
 												const pois = searchCriteria.pointsOfInterest || [];
-												const existingIndex = pois.findIndex(
-													(poi) => poi.type === (type as POIType),
-												);
+												const existingIndex = pois.findIndex((poi) => poi.type === (type as POIType));
 												const newPois = [...pois];
 
 												if (existingIndex >= 0) {
@@ -493,10 +421,7 @@ export default function AdvancedSearch({
 											</SelectTrigger>
 											<SelectContent>
 												{[0.5, 1, 2, 5].map((distance) => (
-													<SelectItem
-														key={distance}
-														value={distance.toString()}
-													>
+													<SelectItem key={distance} value={distance.toString()}>
 														Within {distance} mile{distance !== 1 ? "s" : ""}
 													</SelectItem>
 												))}
@@ -512,10 +437,7 @@ export default function AdvancedSearch({
 					<div className="space-y-2">
 						<div className="flex items-center justify-between">
 							<Label>Commute Search</Label>
-							<Switch
-								checked={showCommuteSearch}
-								onCheckedChange={setShowCommuteSearch}
-							/>
+							<Switch checked={showCommuteSearch} onCheckedChange={setShowCommuteSearch} />
 						</div>
 						{showCommuteSearch && (
 							<div className="grid gap-4 sm:grid-cols-2 mt-2">
@@ -538,8 +460,7 @@ export default function AdvancedSearch({
 														},
 													},
 													maxTime: prev.commute?.maxTime || 30,
-													transportMode:
-														prev.commute?.transportMode || "driving",
+													transportMode: prev.commute?.transportMode || "driving",
 												},
 											}));
 
@@ -556,8 +477,7 @@ export default function AdvancedSearch({
 																		coordinates: coords,
 																	},
 																	maxTime: prev.commute?.maxTime || 30,
-																	transportMode:
-																		prev.commute?.transportMode || "driving",
+																	transportMode: prev.commute?.transportMode || "driving",
 																},
 															}));
 														}
@@ -583,8 +503,7 @@ export default function AdvancedSearch({
 														address: "",
 														coordinates: { lat: 0, lng: 0 },
 													},
-													transportMode:
-														searchCriteria.commute?.transportMode || "driving",
+													transportMode: searchCriteria.commute?.transportMode || "driving",
 												},
 											})
 										}
@@ -605,9 +524,7 @@ export default function AdvancedSearch({
 									<Label>Transport Mode</Label>
 									<Select
 										value={searchCriteria.commute?.transportMode}
-										onValueChange={(
-											value: "driving" | "transit" | "walking" | "bicycling",
-										) =>
+										onValueChange={(value: "driving" | "transit" | "walking" | "bicycling") =>
 											setSearchCriteria({
 												...searchCriteria,
 												commute: {
@@ -644,11 +561,7 @@ export default function AdvancedSearch({
 									<Label htmlFor="notifications" className="text-sm">
 										Email Notifications
 									</Label>
-									<Switch
-										id="notifications"
-										checked={emailNotifications}
-										onCheckedChange={setEmailNotifications}
-									/>
+									<Switch id="notifications" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
 								</div>
 							</div>
 							<div className="flex gap-2">

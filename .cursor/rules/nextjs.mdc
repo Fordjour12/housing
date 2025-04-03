@@ -34,10 +34,11 @@ app/
 │   ├── register/
 │   │   └── page.tsx         # RSC: Handle registration
 │   └── layout.tsx           # Public layout (server-rendered)
-├── (dashboard)/              # Authenticated routes
+├── onboarding/
+│   ├── page.tsx
+├── dashboard/              # Authenticated routes
 │   ├── layout.tsx           # RSC: Shared layout with role-based navigation
-│   ├── dashboard/
-│   │   └── page.tsx         # RSC: Role-specific dashboard
+│   ├── page.tsx              # RSC: Role-specific dashboard
 │   ├── properties/
 │   │   ├── layout.tsx       # RSC: Property-specific navigation
 │   │   ├── page.tsx         # RSC: List properties (filtered by role)

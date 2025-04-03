@@ -4,29 +4,13 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-	Search,
-	Heart,
-	BedDouble,
-	Bath,
-	Square,
-	SlidersHorizontal,
-} from "lucide-react";
+import { Search, Heart, BedDouble, Bath, Square, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
-import GoogleMapComponent, {
-	type PropertyLocation,
-} from "@/components/google-map";
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-	SheetTrigger,
-} from "@/components/ui/sheet";
+import GoogleMapComponent, { type PropertyLocation } from "@/components/google-map";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import AdvancedSearch from "@/components/advanced-search";
 import type { SearchCriteria, SavedSearch } from "@/types/search";
-import { saveSearch } from "@/app/protected/services/saved-searches";
+import { saveSearch } from "@/protected/services/saved-searches";
 
 // Sample data for listings
 const LISTINGS_DATA = [
@@ -180,9 +164,7 @@ export default function ListingsWithMap() {
 		console.log("Search criteria:", criteria);
 	};
 
-	const handleSaveSearch = async (
-		search: Omit<SavedSearch, "id" | "created">,
-	) => {
+	const handleSaveSearch = async (search: Omit<SavedSearch, "id" | "created">) => {
 		try {
 			const savedSearch = await saveSearch(search);
 			setSavedSearches([...savedSearches, savedSearch]);
@@ -231,9 +213,7 @@ export default function ListingsWithMap() {
 							<SheetContent side="right" className="w-full sm:w-[540px]">
 								<SheetHeader>
 									<SheetTitle>Advanced Search</SheetTitle>
-									<SheetDescription>
-										Use advanced filters to find your perfect rental
-									</SheetDescription>
+									<SheetDescription>Use advanced filters to find your perfect rental</SheetDescription>
 								</SheetHeader>
 								<div className="mt-6">
 									<AdvancedSearch
@@ -259,9 +239,7 @@ export default function ListingsWithMap() {
 				{(!isMobileView || !showMap) && (
 					<div className="w-full md:w-1/2 overflow-y-auto p-4">
 						<div className="mb-4">
-							<h2 className="text-xl font-bold">
-								{LISTINGS_DATA.length} Rentals in Houston, TX
-							</h2>
+							<h2 className="text-xl font-bold">{LISTINGS_DATA.length} Rentals in Houston, TX</h2>
 						</div>
 						<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 							{LISTINGS_DATA.map((listing) => (
@@ -269,8 +247,7 @@ export default function ListingsWithMap() {
 									key={listing.id}
 									className={cn(
 										"border rounded-lg overflow-hidden transition-all duration-200",
-										(hoveredListing === listing.id ||
-											selectedListing === listing.id) &&
+										(hoveredListing === listing.id || selectedListing === listing.id) &&
 											"ring-2 ring-primary shadow-lg",
 									)}
 									onMouseEnter={() => handleListingHover(listing.id)}
@@ -298,9 +275,7 @@ export default function ListingsWithMap() {
 												<Heart
 													className={cn(
 														"h-5 w-5",
-														favorites.includes(listing.id)
-															? "fill-red-500 text-red-500"
-															: "text-gray-600",
+														favorites.includes(listing.id) ? "fill-red-500 text-red-500" : "text-gray-600",
 													)}
 												/>
 											</Button>
@@ -316,9 +291,7 @@ export default function ListingsWithMap() {
 									</div>
 									<div className="p-4">
 										<div className="flex justify-between items-start">
-											<h3 className="text-lg font-bold">
-												${listing.price.toLocaleString()}/mo
-											</h3>
+											<h3 className="text-lg font-bold">${listing.price.toLocaleString()}/mo</h3>
 										</div>
 										<div className="flex items-center gap-3 text-sm text-muted-foreground mt-2">
 											<span className="flex items-center">
@@ -352,9 +325,7 @@ export default function ListingsWithMap() {
 							properties={getMapProperties()}
 							height="100%"
 							highlightedProperty={hoveredListing || selectedListing}
-							onMarkerClick={(property) =>
-								handleListingClick(Number(property.id))
-							}
+							onMarkerClick={(property) => handleListingClick(Number(property.id))}
 							zoom={mapZoom}
 						/>
 					</div>

@@ -1,3 +1,5 @@
+CREATE TYPE "public"."permission" AS ENUM('create', 'read', 'update', 'delete');--> statement-breakpoint
+CREATE TYPE "public"."resource" AS ENUM('listings', 'users', 'reports', 'analytics', 'maintenance', 'payments', 'tenants');--> statement-breakpoint
 CREATE TYPE "public"."property_status" AS ENUM('active', 'pending', 'inactive');--> statement-breakpoint
 CREATE TYPE "public"."maintenance_status" AS ENUM('open', 'in_progress', 'resolved');--> statement-breakpoint
 CREATE TYPE "public"."payment_status" AS ENUM('pending', 'paid', 'late', 'failed');--> statement-breakpoint
@@ -45,15 +47,26 @@ CREATE TABLE "role" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
-	"can_create_listings" boolean DEFAULT false NOT NULL,
-	"can_edit_listings" boolean DEFAULT false NOT NULL,
-	"can_apply_for_rentals" boolean DEFAULT false NOT NULL,
-	"can_manage_users" boolean DEFAULT false NOT NULL,
-	"can_manage_multiple_properties" boolean DEFAULT false NOT NULL,
-	"can_view_reports" boolean DEFAULT false NOT NULL,
-	"can_view_analytics" boolean DEFAULT false NOT NULL,
+	"permissions" jsonb NOT NULL,
+	"is_system" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "role_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
+CREATE TABLE "role_audit_log" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"role_id" text NOT NULL,
+	"action" text NOT NULL,
+	"performed_by" text NOT NULL,
+	"timestamp" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "role_hierarchy" (
+	"parent_role_id" text NOT NULL,
+	"child_role_id" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user_role" (
@@ -270,6 +283,11 @@ CREATE TABLE "currency_support" (
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "role_audit_log" ADD CONSTRAINT "role_audit_log_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "role_audit_log" ADD CONSTRAINT "role_audit_log_role_id_role_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."role"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "role_audit_log" ADD CONSTRAINT "role_audit_log_performed_by_user_id_fk" FOREIGN KEY ("performed_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "role_hierarchy" ADD CONSTRAINT "role_hierarchy_parent_role_id_role_id_fk" FOREIGN KEY ("parent_role_id") REFERENCES "public"."role"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "role_hierarchy" ADD CONSTRAINT "role_hierarchy_child_role_id_role_id_fk" FOREIGN KEY ("child_role_id") REFERENCES "public"."role"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_role" ADD CONSTRAINT "user_role_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_role" ADD CONSTRAINT "user_role_role_id_role_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."role"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "property" ADD CONSTRAINT "property_owner_id_user_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

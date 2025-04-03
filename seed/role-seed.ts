@@ -1,94 +1,53 @@
 import { db } from "@/lib/database";
-import { role } from "@/schema";
-import { assignRoleToUser } from "@/actions/server/role";
+import * as schema from "@/schema";
 
-export const roles = [
-	{
-		id: "admin",
-		name: "Administrator",
-		description: "Full system access",
-		canCreateListings: true,
-		canEditListings: true,
-		canApplyForRentals: true,
-		canManageUsers: true,
-		canManageMultipleProperties: true,
-		canViewReports: true,
-		canViewAnalytics: true,
+export const defaultRoles = {
+	renter: {
+		name: "renter",
+		description: "Standard renter account",
+		permissions: {
+			listings: ["read"],
+			maintenance: ["create", "read"],
+			payments: ["read", "create"],
+		},
+		isSystem: true
 	},
-	{
-		id: "property_manager",
-		name: "Property Manager",
-		description: "Manage properties and listings",
-		canCreateListings: true,
-		canEditListings: true,
-		canApplyForRentals: false,
-		canManageUsers: false,
-		canManageMultipleProperties: true,
-		canViewReports: true,
-		canViewAnalytics: true,
+	landlord: {
+		name: "landlord",
+		description: "Property owner account",
+		permissions: {
+			listings: ["create", "read", "update", "delete"],
+			maintenance: ["read", "update"],
+			payments: ["read", "create", "update"],
+			reports: ["read"],
+			analytics: ["read"],
+		},
+		isSystem: true
 	},
-	{
-		id: "landlord",
-		name: "Landlord",
-		description: "Manage own properties",
-		canCreateListings: true,
-		canEditListings: true,
-		canApplyForRentals: false,
-		canManageUsers: false,
-		canManageMultipleProperties: false,
-		canViewReports: true,
-		canViewAnalytics: false,
-	},
-	{
-		id: "renter",
-		name: "Renter",
-		description: "Browse and apply for rentals",
-		canCreateListings: false,
-		canEditListings: false,
-		canApplyForRentals: true,
-		canManageUsers: false,
-		canManageMultipleProperties: false,
-		canViewReports: false,
-		canViewAnalytics: false,
-	},
-];
+	"property-manager": {
+		name: "property-manager",
+		description: "Property management account",
+		permissions: {
+			listings: ["create", "read", "update", "delete"],
+			maintenance: ["create", "read", "update", "delete"],
+			payments: ["create", "read", "update", "delete"],
+			reports: ["create", "read", "update", "delete"],
+			analytics: ["create", "read", "update", "delete"],
+			tenants: ["create", "read", "update", "delete"],
+			users: ["read", "update"]
+		},
+		isSystem: true
+	}
+} as const;
 
 export async function seedRoles() {
-	console.log("Seeding roles...");
-
-	try {
-		// Clear existing roles
-		await db.delete(role);
-
-		// Insert roles
-		await db.insert(role).values(roles);
-		console.log("Roles seeded successfully!");
-	} catch (error) {
-		console.error("Error seeding roles:", error);
-		throw error;
-	}
-}
-
-// Helper function to assign roles to users
-export async function assignRolesToUsers(
-	users: { id: string; role: string }[],
-) {
-	console.log("Assigning roles to users...");
-
-	try {
-		for (const user of users) {
-			const result = await assignRoleToUser(user.id, user.role);
-			if (!result.success) {
-				console.error(
-					`Failed to assign role ${user.role} to user ${user.id}:`,
-					result.error,
-				);
-			}
-		}
-
-		console.log("Roles assigned to users successfully!");
-	} catch (error) {
-		console.error("Error assigning roles to users:", error);
-		throw error;
-	}
+	await db.insert(schema.role).values(
+		Object.values(defaultRoles).map(role => ({
+			id: crypto.randomUUID(),
+			name: role.name,
+			description: role.description,
+			permissions: role.permissions as unknown as schema.Permissions,
+			isSystem: role.isSystem
+		}))
+	);
 }

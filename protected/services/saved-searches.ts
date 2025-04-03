@@ -1,9 +1,7 @@
 import type { Listing, SavedSearch, SearchCriteria } from "@/types/search";
-import { calculateHaversineDistance } from "@/app/protected/services/geocoding";
+import { calculateHaversineDistance } from "@/protected/services/geocoding";
 
-export async function saveSearch(
-	search: Omit<SavedSearch, "id" | "created">,
-): Promise<SavedSearch> {
+export async function saveSearch(search: Omit<SavedSearch, "id" | "created">): Promise<SavedSearch> {
 	// In a real application, this would make an API call to save the search
 	// For now, we'll simulate it with localStorage
 	const savedSearches = getSavedSearches();
@@ -34,10 +32,7 @@ export function deleteSavedSearch(id: string): void {
 	localStorage.setItem("savedSearches", JSON.stringify(savedSearches));
 }
 
-export function matchesSearchCriteria(
-	listing: Listing,
-	criteria: SearchCriteria,
-): boolean {
+export function matchesSearchCriteria(listing: Listing, criteria: SearchCriteria): boolean {
 	// Check location and radius
 	if (criteria.location.coordinates && criteria.location.radius) {
 		const distance = calculateHaversineDistance(
@@ -67,45 +62,32 @@ export function matchesSearchCriteria(
 	}
 
 	// Check bathrooms
-	if (
-		criteria.bathrooms?.length &&
-		!criteria.bathrooms.includes(listing.baths)
-	) {
+	if (criteria.bathrooms?.length && !criteria.bathrooms.includes(listing.baths)) {
 		return false;
 	}
 
 	// Check property type
-	if (
-		criteria.propertyTypes?.length &&
-		!criteria.propertyTypes.includes(listing.propertyType)
-	) {
+	if (criteria.propertyTypes?.length && !criteria.propertyTypes.includes(listing.propertyType)) {
 		return false;
 	}
 
 	// Check amenities
 	if (criteria.amenities?.length) {
-		const hasAllAmenities = criteria.amenities.every((amenity) =>
-			listing.amenities.includes(amenity),
-		);
+		const hasAllAmenities = criteria.amenities.every((amenity) => listing.amenities.includes(amenity));
 		if (!hasAllAmenities) {
 			return false;
 		}
 	}
 
 	// Check pet friendly
-	if (
-		criteria.petPolicy?.allowed !== undefined &&
-		listing.petFriendly !== criteria.petPolicy.allowed
-	) {
+	if (criteria.petPolicy?.allowed !== undefined && listing.petFriendly !== criteria.petPolicy.allowed) {
 		return false;
 	}
 
 	return true;
 }
 
-export async function checkForNewListings(
-	savedSearch: SavedSearch,
-): Promise<number> {
+export async function checkForNewListings(savedSearch: SavedSearch): Promise<number> {
 	// In a real application, this would:
 	// 1. Make an API call to fetch new listings since lastNotified
 	// 2. Compare them against the search criteria
@@ -124,10 +106,7 @@ export function updateSavedSearch(search: SavedSearch): void {
 	}
 }
 
-export async function setupEmailNotifications(
-	searchId: string,
-	enabled: boolean,
-): Promise<void> {
+export async function setupEmailNotifications(searchId: string, enabled: boolean): Promise<void> {
 	// In a real application, this would make an API call to update notification preferences
 	const savedSearches = getSavedSearches();
 	const search = savedSearches.find((s) => s.id === searchId);
