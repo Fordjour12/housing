@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1742754536382,
-      "tag": "0000_slippery_sunfire",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1743027831443,
-      "tag": "0001_absent_miek",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1743081126641,
-      "tag": "0002_sleepy_iron_lad",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1743500285469,
-      "tag": "0003_volatile_sprite",
+      "when": 1743617652946,
+      "tag": "0000_nappy_mulholland_black",
       "breakpoints": true
     }
   ]

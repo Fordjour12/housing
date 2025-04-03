@@ -1,5 +1,5 @@
 import type { Listing, SavedSearch, SearchCriteria } from "@/types/search";
-import { calculateHaversineDistance } from "@/app/services/geocoding";
+import { calculateHaversineDistance } from "@/app/protected/services/geocoding";
 
 export async function saveSearch(
 	search: Omit<SavedSearch, "id" | "created">,

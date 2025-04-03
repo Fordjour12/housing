@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/sheet";
 import AdvancedSearch from "@/components/advanced-search";
 import type { SearchCriteria, SavedSearch } from "@/types/search";
-import { saveSearch } from "@/app/services/saved-searches";
+import { saveSearch } from "@/app/protected/services/saved-searches";
 
 // Sample data for listings
 const LISTINGS_DATA = [
