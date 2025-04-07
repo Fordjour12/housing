@@ -1,9 +1,13 @@
 import ResetPasswordForm from "@/components/auth/reset-password";
 
-export default function ResetPasswordPage({
-	params: { token },
-}: {
-	params: { token: string };
-}) {
+interface ResetPasswordPageProps {
+	params: Promise<{ token: string }>;
+}
+
+export default async function ResetPasswordPage({
+	params,
+}: ResetPasswordPageProps) {
+	const { token } = await params;
 	return <ResetPasswordForm token={token} />;
 }
+
