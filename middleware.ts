@@ -12,10 +12,6 @@ export async function middleware(request: NextRequest) {
     cookiePrefix: "better-auth"
   });
 
-  //   await auth.api.getSession({
-  //   headers: await headers(),
-  // });
-
   const dashboardPath = "/dashboard";
   const propertiesPath = "/properties";
   const loginPath = "/login";
