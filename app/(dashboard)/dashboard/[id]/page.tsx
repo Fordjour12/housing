@@ -1,10 +1,12 @@
-interface DashboardPageProps {
-	params: {
-		id: Promise<string>;
-	};
+interface DashboardIdPageProps {
+  params: Promise<{ id: string }>
 }
 
-export default async function DashboardPage({ params }: DashboardPageProps) {
-	const id = await params.id;
-	return <div>Dashboard {id}</div>;
+export default async function DashboardIdPage({
+  params,
+}: DashboardIdPageProps) {
+  const { id } = await params
+  console.log('slug', id)
+
+  return <div>My Post: {id}</div>
 }
