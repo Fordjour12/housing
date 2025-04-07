@@ -94,7 +94,7 @@ app/
 - **Syntax**:
   ```tsx
   'use server';
-  import { db } from '@/db';
+  import { db } from '@/lib/database';
   import { property } from '@/schema';
 
   export async function createProperty(formData: FormData) {

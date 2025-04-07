@@ -1,13 +1,12 @@
 import {
 	pgTable,
-	serial,
 	text,
 	timestamp,
 	boolean,
 	integer,
 	numeric,
 	pgEnum,
-	PgArray
+	PgArray,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
@@ -29,7 +28,7 @@ export const propertyStatusEnum = pgEnum("property_status", [
 
 /** Property table for managing rental properties */
 export const property = pgTable("property", {
-	id: serial("id").primaryKey(),
+	id: text("id").primaryKey(),
 	title: text("title").notNull(),
 	description: text("description").notNull(),
 	streetAddress: text("street_address").notNull(),
@@ -61,10 +60,10 @@ export const property = pgTable("property", {
 	photos: text("photos").array(),
 	isAvailable: boolean("is_available").default(true).notNull(),
 	status: propertyStatusEnum("status").default("pending").notNull(),
-	ownerId: serial("owner_id")
+	ownerId: text("owner_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
-	propertyManagerId: serial("property_manager_id").references(() => user.id, {
+	propertyManagerId: text("property_manager_id").references(() => user.id, {
 		onDelete: "set null",
 	}),
 	createdAt: timestamp("created_at").defaultNow().notNull(),

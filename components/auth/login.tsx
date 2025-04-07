@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { signIn } from "@/actions/server/auth";
 
 export default function LoginForm() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -42,15 +43,15 @@ export default function LoginForm() {
 	async function onSubmit(values: z.infer<LoginSchema>) {
 		try {
 			setIsLoading(true);
-			// const result = await login(values.email, values.password);
+			const result = await signIn(values.email, values.password);
 
-			/*if (result.success) {
+			if (result) {
 				toast.success("Login successful");
-				router.push("/listings");
-	router.push(callbackUrl);
+				router.push("/");
 			} else {
-				toast.error(result.error || "Failed to login. Please try again.");
-			}*/
+				console.log(result);
+				toast.error( "Failed to login. Please try again.");
+			}
 		} catch (error) {
 			console.error("Login error:", error);
 			toast.error("Failed to login. Please try again.");
