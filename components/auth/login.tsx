@@ -19,12 +19,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useUser } from "@/context/user-context";
 import { toast } from "sonner";
 
 export default function LoginForm() {
 	const [isLoading, setIsLoading] = useState(false);
-	const { login } = useUser();
 	const form = useForm<z.infer<LoginSchema>>({
 		resolver: zodResolver(loginSchema),
 		resetOptions: {
@@ -38,17 +36,21 @@ export default function LoginForm() {
 
 	// 2. Define a submit handler.
 	const router = useRouter();
+	// const searchParams = useSearchParams(); // Correct hook for accessing query parameters
+	// const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"; // Default to /dashboard if no callbackUrl
+
 	async function onSubmit(values: z.infer<LoginSchema>) {
 		try {
 			setIsLoading(true);
-			const result = await login(values.email, values.password);
+			// const result = await login(values.email, values.password);
 
-			if (result.success) {
+			/*if (result.success) {
 				toast.success("Login successful");
 				router.push("/listings");
+	router.push(callbackUrl);
 			} else {
 				toast.error(result.error || "Failed to login. Please try again.");
-			}
+			}*/
 		} catch (error) {
 			console.error("Login error:", error);
 			toast.error("Failed to login. Please try again.");
@@ -56,6 +58,7 @@ export default function LoginForm() {
 			setIsLoading(false);
 		}
 	}
+
 	return (
 		<section className="flex min-h-scree bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
 			<Form {...form}>
@@ -145,7 +148,17 @@ export default function LoginForm() {
 								name="password"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Password</FormLabel>
+										<div className="flex items-center justify-between">
+											<FormLabel>Password</FormLabel>
+											<Button
+												asChild
+												variant="link"
+												className="px-0 h-auto font-normal"
+												disabled={isLoading}
+											>
+												<Link href="/forgot-password">Forgot password?</Link>
+											</Button>
+										</div>
 										<FormControl>
 											<Input type="password" disabled={isLoading} {...field} />
 										</FormControl>

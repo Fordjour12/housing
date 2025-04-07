@@ -38,3 +38,22 @@ export function formatCurrency(
 		return "$0";
 	}
 }
+
+/**
+ * Validates a callback URL
+ * @param url - The URL to validate
+ * @returns True if the URL is valid, false otherwise
+ */
+export const isValidCallbackUrl = (url: string): boolean => {
+	try {
+		const parsedUrl = new URL(url, window.location.origin); // Resolve relative URLs
+		const allowedDomains = [
+			window.location.hostname,
+			"your-other-trusted-domain.com",
+		]; // Replace with your allowed domains
+		return allowedDomains.includes(parsedUrl.hostname);
+	} catch (error) {
+		console.error("Invalid callback URL:", url);
+		return false;
+	}
+};
