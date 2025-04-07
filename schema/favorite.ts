@@ -1,15 +1,15 @@
-import { pgTable, serial, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
 import { property } from "./property";
 
 /** Favorite table for storing user's favorite properties */
 export const favorite = pgTable("favorite", {
-	id: serial("id").primaryKey(),
-	userId: serial("user_id")
+	id: text("id").primaryKey(),
+	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
-	propertyId: serial("property_id")
+	propertyId: text("property_id")
 		.notNull()
 		.references(() => property.id, { onDelete: "cascade" }),
 	createdAt: timestamp("created_at").defaultNow().notNull(),

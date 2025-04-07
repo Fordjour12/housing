@@ -1,11 +1,11 @@
-import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { user } from "./user";
 
 /** Search history table for storing user's property search history */
 export const searchHistory = pgTable("search_history", {
-	id: serial("id").primaryKey(),
-	userId: serial("user_id")
+	id: text("id").primaryKey(),
+	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	searchQuery: text("search_query").notNull(),

@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { property } from "./property";
 import { user } from "./user";
@@ -12,11 +12,11 @@ export const maintenanceStatusEnum = pgEnum("maintenance_status", [
 
 /** Maintenance tickets table for tracking property maintenance issues */
 export const maintenanceTickets = pgTable("maintenance_tickets", {
-	id: serial("id").primaryKey(),
-	propertyId: serial("property_id")
+	id: text("id").primaryKey(),
+	propertyId: text("property_id")
 		.notNull()
 		.references(() => property.id, { onDelete: "cascade" }),
-	tenantId: serial("tenant_id")
+	tenantId: text("tenant_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	issueDescription: text("issue_description").notNull(),
