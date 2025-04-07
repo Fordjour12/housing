@@ -1,5 +1,4 @@
- @import "tailwindcss";
- @import "./themes.css";
+@import "tailwindcss";
 
 @plugin "tailwindcss-animate";
 
@@ -118,11 +117,8 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
-} 
-
-
-
-
+}

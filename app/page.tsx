@@ -3,18 +3,10 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Home, Shield, DollarSign, ArrowRight } from "lucide-react";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import Header from "@/components/header";
 
 export default async function LandingPage() {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	});
-
 	return (
 		<div className="flex min-h-screen flex-col">
-			<Header user={session?.user} />
 
 			<main className="flex-1">
 				{/* Hero Section */}
