@@ -16,6 +16,7 @@ import { usageAnalytics } from "./usageAnalytics";
 import { securityLogs } from "./securityLogs";
 import { teamMember } from "./teamMember";
 import { propertyManagerFirm } from "./propertyManagerFirm";
+import { renterPreferences } from "./renterPreferences";
 
 /** User table for storing user information */
 export const user = pgTable("user", {
@@ -49,6 +50,7 @@ export const userRelations = relations(user, ({ many }) => ({
 	securityLogs: many(securityLogs),
 	teamMembers: many(teamMember),
 	propertyManagerFirms: many(propertyManagerFirm),
+	renterPreferences: many(renterPreferences),
 }));
 
 /** Type for selecting users */
