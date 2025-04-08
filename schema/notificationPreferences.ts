@@ -9,8 +9,11 @@ export const notificationPreferences = pgTable("notification_preferences", {
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	emailNotifications: boolean("email_notifications").default(true).notNull(),
-	smsNotifications: boolean("sms_notifications").default(false).notNull(),
+	pushNotifications: boolean("push_notifications").default(false).notNull(),
+	newListings: boolean("new_listings").default(true).notNull(),
+	applicationUpdates: boolean("application_updates").default(true).notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 /** Relations for the notification preferences table */
