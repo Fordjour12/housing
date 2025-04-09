@@ -144,7 +144,7 @@ export async function completeRenterOnboarding(data: RenterFormValues) {
 	}
 }
 
-export async function updateUserRole(role: UserRole) {
+export async function updateOrCreateUserRole(role: UserRole) {
 	try {
 		const session = await auth.api.getSession({ headers: await headers() });
 		if (!session?.user?.id) {
@@ -156,52 +156,6 @@ export async function updateUserRole(role: UserRole) {
 			renter: "renter",
 			landlord: "landlord",
 			property_manager: "property_manager",
-		};
-
-		// Default permissions based on role
-		const getPermissionsByRole = (role: UserRole): Permissions => {
-			switch (role) {
-				case "renter":
-					return {
-						listings: ["read"],
-						users: ["read"],
-						maintenance: ["create", "read"],
-						payments: ["create", "read"],
-						tenants: ["read"],
-						reports: [],
-						analytics: [],
-					};
-				case "landlord":
-					return {
-						listings: ["create", "read", "update"],
-						users: ["read"],
-						reports: ["read"],
-						analytics: ["read"],
-						payments: ["read"],
-						maintenance: ["create", "read", "update"],
-						tenants: ["read", "update"],
-					};
-				case "property_manager":
-					return {
-						listings: ["create", "read", "update", "delete"],
-						users: ["read"],
-						reports: ["read"],
-						analytics: ["read"],
-						payments: ["read", "update"],
-						maintenance: ["create", "read", "update"],
-						tenants: ["read", "update"],
-					};
-				default:
-					return {
-						listings: [],
-						users: [],
-						reports: [],
-						analytics: [],
-						maintenance: [],
-						payments: [],
-						tenants: [],
-					};
-			}
 		};
 
 		// Start a transaction
@@ -227,23 +181,25 @@ export async function updateUserRole(role: UserRole) {
 				return { error: "Role not found" };
 			}
 
-			// Check if the user already has this role
-			const existingUserRole = await tx.query.userRole.findFirst({
-				where: (userRole) =>
-					and(
-						eq(userRole.userId, session.user.id),
-						eq(userRole.roleId, roleEntry.id),
-					),
+			// Check if the user has any existing roles
+			const existingUserRoles = await tx.query.userRole.findMany({
+				where: eq(schema.userRole.userId, session.user.id),
 			});
 
-			// If not, add the role to the user
-			if (!existingUserRole) {
-				await tx.insert(schema.userRole).values({
-					userId: session.user.id,
-					roleId: roleEntry.id,
-					assignedAt: new Date(),
-				});
+			// If user has existing roles, update them
+			if (existingUserRoles.length > 0) {
+				// Delete all existing roles
+				await tx
+					.delete(schema.userRole)
+					.where(eq(schema.userRole.userId, session.user.id));
 			}
+
+			// Add the new role
+			await tx.insert(schema.userRole).values({
+				userId: session.user.id,
+				roleId: roleEntry.id,
+				assignedAt: new Date(),
+			});
 		});
 
 		return { success: true };
