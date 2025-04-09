@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "./lib/auth";
-import { headers } from "next/headers";
 import { getSessionCookie } from "better-auth/cookies";
+;
+
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
+
   const sessionToken = getSessionCookie(request, {
     // Optionally pass config if cookie name or prefix is customized in auth config.
     cookieName: "session_token",
     cookiePrefix: "better-auth"
   });
+
 
   const dashboardPath = "/dashboard";
   const propertiesPath = "/properties";
@@ -18,8 +20,14 @@ export async function middleware(request: NextRequest) {
   const registerPath = "/register";
   const forgotPasswordPath = "/forgot-password";
   const resetPasswordPath = "/reset-password";
+  const onboardingPath = "/onboarding";
 
-  if (request.nextUrl.pathname.startsWith(dashboardPath) || request.nextUrl.pathname.startsWith(propertiesPath)) {
+  // If user tries to access dashboard or properties pages
+  if (
+    request.nextUrl.pathname.startsWith(dashboardPath) ||
+    request.nextUrl.pathname.startsWith(propertiesPath)
+  ) {
+    // Check if user has valid session token
     if (!sessionToken) {
       // Redirect to login if no session token
       const url = request.nextUrl.clone();
@@ -31,7 +39,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow access to login and register pages if no session token is present
+  // If user is already logged in and tries to access auth pages (login, register, etc),
+  // redirect them to dashboard instead
   if (
     (request.nextUrl.pathname === loginPath ||
       request.nextUrl.pathname === registerPath ||
@@ -44,7 +53,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // For all other routes, allow access
+  // If user tries to access onboarding without being logged in,
+  // redirect to login page
+  if (request.nextUrl.pathname === onboardingPath && !sessionToken) {
+    const url = request.nextUrl.clone();
+    url.pathname = loginPath;
+    return NextResponse.redirect(url);
+  }
+
   return NextResponse.next();
 }
 
@@ -57,6 +73,7 @@ export const config = {
     "/register",
     "/forgot-password",
     "/reset-password",
-    "/properties/:path*"
+    "/properties/:path*",
+    "/onboarding"
   ],
 };
