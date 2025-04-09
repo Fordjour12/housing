@@ -12,6 +12,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Building, Home, UserCheck } from "lucide-react";
+import { updateUserRole } from "@/actions/server/onboarding";
+import { toast } from "sonner"
 
 interface RoleCardProps {
   role: UserRole;
@@ -38,7 +40,8 @@ function RoleCard({
 }: RoleCardProps) {
   return (
     <Card
-      className={`cursor-pointer transition-all h-full flex flex-col ${ // Added h-full and flex for consistent height
+      className={`cursor-pointer transition-all h-full flex flex-col ${
+        // Added h-full and flex for consistent height
         isSelected
           ? "border-2 border-primary shadow-lg scale-105"
           : "hover:shadow-md hover:scale-102 border" // Added border for consistent base style
@@ -58,7 +61,9 @@ function RoleCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex-grow"> {/* Added flex-grow */}
+      <CardContent className="flex-grow">
+        {" "}
+        {/* Added flex-grow */}
         <CardDescription className="text-sm">{description}</CardDescription>
       </CardContent>
     </Card>
@@ -76,7 +81,8 @@ const containerVariants = {
   },
 };
 
-const itemVariants = { // For text and buttons blocks
+const itemVariants = {
+  // For text and buttons blocks
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -85,7 +91,8 @@ const itemVariants = { // For text and buttons blocks
   },
 };
 
-const gridVariants = { // For the grid container itself to manage card staggering
+const gridVariants = {
+  // For the grid container itself to manage card staggering
   hidden: { opacity: 1 }, // Grid container is immediately visible to start staggering
   visible: {
     opacity: 1,
@@ -96,7 +103,8 @@ const gridVariants = { // For the grid container itself to manage card staggerin
   },
 };
 
-const cardVariants = { // For individual cards
+const cardVariants = {
+  // For individual cards
   hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
@@ -105,9 +113,12 @@ const cardVariants = { // For individual cards
   },
 };
 
-
-export default function RoleSelection({ onRoleSelectedAction, onBackAction }: RoleSelectionProps) {
+export default function RoleSelection({
+  onRoleSelectedAction,
+  onBackAction,
+}: RoleSelectionProps) {
   const [selectedRole, setSelectedRole] = useState<UserRole | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const roleOptions = [
     {
@@ -137,9 +148,31 @@ export default function RoleSelection({ onRoleSelectedAction, onBackAction }: Ro
     setSelectedRole(role);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (selectedRole) {
-      onRoleSelectedAction(selectedRole);
+      setIsSubmitting(true);
+      try {
+        // Save the role to the database
+        const result = await updateUserRole(selectedRole);
+
+        if (result.error) {
+          toast("Error in updating role", {
+            description:
+              result.message || "Failed to update role. Please try again.",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
+        // If successful, continue to the next step
+        onRoleSelectedAction(selectedRole);
+      } catch (error) {
+        console.error("Error saving role:", error);
+        toast("Error", {
+          description: "An unexpected error occurred. Please try again.",
+        });
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -169,7 +202,13 @@ export default function RoleSelection({ onRoleSelectedAction, onBackAction }: Ro
         >
           {roleOptions.map((option) => (
             // Animate each card individually
-            <motion.div key={option.role} variants={cardVariants} className="h-full"> {/* Added h-full */}
+            <motion.div
+              key={option.role}
+              variants={cardVariants}
+              className="h-full"
+            >
+              {" "}
+              {/* Added h-full */}
               <RoleCard
                 // key is now on the motion wrapper
                 role={option.role}
@@ -188,11 +227,18 @@ export default function RoleSelection({ onRoleSelectedAction, onBackAction }: Ro
           className="flex justify-between mt-8"
           variants={itemVariants}
         >
-          <Button variant="outline" onClick={onBackAction}>
+          <Button
+            variant="outline"
+            onClick={onBackAction}
+            disabled={isSubmitting}
+          >
             Back
           </Button>
-          <Button onClick={handleContinue} disabled={!selectedRole}>
-            Continue
+          <Button
+            onClick={handleContinue}
+            disabled={!selectedRole || isSubmitting}
+          >
+            {isSubmitting ? "Saving..." : "Continue"}
           </Button>
         </motion.div>
       </motion.div>
