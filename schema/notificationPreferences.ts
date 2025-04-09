@@ -7,7 +7,8 @@ export const notificationPreferences = pgTable("notification_preferences", {
 	id: text("id").primaryKey(),
 	userId: text("user_id")
 		.notNull()
-		.references(() => user.id, { onDelete: "cascade" }),
+		.references(() => user.id, { onDelete: "cascade" })
+		.unique(),
 	emailNotifications: boolean("email_notifications").default(true).notNull(),
 	pushNotifications: boolean("push_notifications").default(false).notNull(),
 	newListings: boolean("new_listings").default(true).notNull(),

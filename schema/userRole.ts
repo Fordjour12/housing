@@ -5,31 +5,31 @@ import { role } from "./role";
 
 /** User role junction table for managing user roles */
 export const userRole = pgTable(
-	"user_role",
-	{
-		userId: text("user_id")
-			.notNull()
-			.references(() => user.id, { onDelete: "cascade" }),
-		roleId: text("role_id")
-			.notNull()
-			.references(() => role.id, { onDelete: "cascade" }),
-		assignedAt: timestamp("assigned_at").defaultNow().notNull(),
-	},
-	(table) => ({
-		pk: primaryKey(table.userId, table.roleId),
-	}),
+  "user_role",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    roleId: text("role_id")
+      .notNull()
+      .references(() => role.id, { onDelete: "cascade" }),
+    assignedAt: timestamp("assigned_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.roleId] }),
+  ]
 );
 
 /** Relations for the user role junction table */
 export const userRoleRelations = relations(userRole, ({ one }) => ({
-	user: one(user, {
-		fields: [userRole.userId],
-		references: [user.id],
-	}),
-	role: one(role, {
-		fields: [userRole.roleId],
-		references: [role.id],
-	}),
+  user: one(user, {
+    fields: [userRole.userId],
+    references: [user.id],
+  }),
+  role: one(role, {
+    fields: [userRole.roleId],
+    references: [role.id],
+  }),
 }));
 
 /** Type for selecting user roles */
