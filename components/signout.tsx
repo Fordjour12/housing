@@ -18,7 +18,11 @@ export function SignOut() {
 	};
 
 	return (
-		<button className="flex items-center py-2 gap-2 ml-2" onClick={handleSignOut}>
+		<button 
+			type="button"
+			className="flex items-center py-2 gap-2 ml-2 cursor-pointer" 
+			onClick={handleSignOut}
+		>
 			<LogOut className="mr-2 size-4" />
 			<span className="text-sm">Logout</span>
 		</button>

@@ -1,8 +1,3 @@
----
-description: 
-globs: 
-alwaysApply: true
----
 # Next.js 15 Property Management Web Application Rules
 
 This is a comprehensive rules file tailored for your Next.js 15 property management web application, using the RSC + API approach. This file is designed to ensure consistency, clarity, and smooth collaboration for anyone working on the project. I’ll include vital information to keep the project running smoothly, incorporate key decisions we’ve made (e.g., RSC preference, role-based structure), and add important planning details.
@@ -25,7 +20,7 @@ The app uses React Server Components (RSC) as the primary data-fetching and rend
 
 ### Directory Structure
 
-The project follows this route layout in the `project` directory:
+The project follows this route layout in the `app` directory:
 
 ```
 /
