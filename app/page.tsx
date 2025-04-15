@@ -23,20 +23,6 @@ export default async function LandingPage() {
 	const session = await auth.api.getSession({headers:await headers()})
 	const user  = session?.user as User | null
 
-	// const [user, setUser] = useState<User | null>(null);
-
-	// useEffect(() => {
-	// 	const fetchUser = async () => {
-	// 		try {
-	// 			const session = await authClient.getSession();
-	// 			setUser(session.data?.user as User);
-	// 		} catch (error) {
-	// 			console.error("Failed to fetch user session:", error);
-	// 		}
-	// 	};
-
-	// 	fetchUser();
-	// }, []);
 
 	return (
 		<div className="flex min-h-screen flex-col">
