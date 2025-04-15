@@ -8,9 +8,8 @@ import { motion } from "motion/react";
 import RoleSelection from "@/components/onboarding/role-selection";
 import RenterSetup from "@/components/onboarding/renter-setup";
 import LandlordSetup from "@/components/onboarding/landlord-setup";
-import PropertyManagerSetup from "@/components/onboarding/property-manager-setup";
+// import PropertyManagerSetup from "@/components/onboarding/property-manager-setup";
 import type { UserRole } from "@/types/user";
-import { toast } from "sonner";
 
 type OnboardingStep = "welcome" | "role" | "setup";
 
@@ -156,7 +155,7 @@ export default function OnboardingClient() {
         </motion.div>
       )}
 
-      {step === "setup" && selectedRole === "property_manager" && (
+      {/* {step === "setup" && selectedRole === "property_manager" && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -167,7 +166,7 @@ export default function OnboardingClient() {
             onBack={handleBack}
           />
         </motion.div>
-      )}
+      )} */}
     </div>
   );
 }
