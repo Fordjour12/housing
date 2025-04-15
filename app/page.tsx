@@ -1,15 +1,48 @@
+// "use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Home, Shield, DollarSign, ArrowRight } from "lucide-react";
+import Header from "@/components/header";
+// import { useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
+type User = {
+	id: string;
+	name: string;
+	email: string;
+	emailVerified: boolean;
+	image: string;
+};
 
 export default async function LandingPage() {
+	const session = await auth.api.getSession({headers:await headers()})
+	const user  = session?.user as User | null
+
+	// const [user, setUser] = useState<User | null>(null);
+
+	// useEffect(() => {
+	// 	const fetchUser = async () => {
+	// 		try {
+	// 			const session = await authClient.getSession();
+	// 			setUser(session.data?.user as User);
+	// 		} catch (error) {
+	// 			console.error("Failed to fetch user session:", error);
+	// 		}
+	// 	};
+
+	// 	fetchUser();
+	// }, []);
+
 	return (
 		<div className="flex min-h-screen flex-col">
-
 			<main className="flex-1">
 				{/* Hero Section */}
+				<Header user={user} />
 				<section className="relative">
 					<div className="absolute inset-0 z-0">
 						<Image
