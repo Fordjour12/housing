@@ -27,7 +27,6 @@ The app uses React Server Components (RSC) as the primary data-fetching and rend
 
 The project follows this route layout in the `project` directory:
 
-```
 /
 ├── app/                      # Next.js app directory
 │   ├── (auth)/              # Authentication routes
@@ -125,7 +124,7 @@ The project follows this route layout in the `project` directory:
 ├── README.md           # Project documentation
 └── .gitignore          # Git ignore rules
 
-```
+
 
 ---
 
