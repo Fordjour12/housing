@@ -1,8 +1,8 @@
 import { AccountProfile } from "@/components/accounts/account-profile";
 import { BillingSettings } from "@/components/accounts/billing-settings";
+import { NotificationPreferences } from "@/components/accounts/notification-preferences";
 import { RenterPreferences } from "@/components/accounts/renter-preferences";
 import { SecuritySettings } from "@/components/accounts/security-settings";
-import { NotificationPreferences } from "@/components/notification-preferences";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/database";
@@ -50,7 +50,8 @@ export default async function AccountPage() {
 				<Tabs defaultValue="account" className="space-y-6">
 					<TabsList className="max-w-4xl mx-auto">
 						<TabsTrigger value="account">Account</TabsTrigger>
-						<TabsTrigger value="customization">Customization</TabsTrigger>
+						<TabsTrigger value="customization">Notifications</TabsTrigger>
+						<TabsTrigger value="security">Security</TabsTrigger>
 						<TabsTrigger value="billing">Billing</TabsTrigger>
 						{isRenter && (
 							<TabsTrigger value="renter-preferences">
@@ -65,6 +66,9 @@ export default async function AccountPage() {
 
 					<TabsContent value="account" className="space-y-6">
 						<AccountProfile user={userData} />
+					</TabsContent>
+
+					<TabsContent value="security" className="space-y-6">
 						<SecuritySettings />
 					</TabsContent>
 
