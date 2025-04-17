@@ -43,3 +43,4 @@ export type SelectRenterPreferences = typeof renterPreferences.$inferSelect;
 
 /** Type for inserting renter preferences */
 export type InsertRenterPreferences = typeof renterPreferences.$inferInsert;
+
