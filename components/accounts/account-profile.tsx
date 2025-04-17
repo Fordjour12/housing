@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -9,14 +10,29 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { SelectUser } from "@/schema/user";
-import { Badge } from "@/components/ui/badge";
+import type { UserRole } from "@/types/user";
 
-interface AccountProfileProps {
-	user: SelectUser;
+interface RenterPreference {
+	phone: string | null;
+	occupation: string | null;
 }
 
-export function AccountProfile({ user }: AccountProfileProps) {
+interface UserData {
+	image: string | null;
+	id: string;
+	role: UserRole | null;
+	email: string;
+	name: string;
+	emailVerified: boolean;
+	onboardingCompleted: boolean | null;
+	createdAt: Date;
+	updatedAt: Date;
+	renterPreferences: RenterPreference | null;
+}
+
+export function AccountProfile({ user }: { user: UserData | undefined }) {
+	const renterPreference = user?.renterPreferences;
+
 	return (
 		<Card>
 			<CardHeader>
@@ -28,13 +44,13 @@ export function AccountProfile({ user }: AccountProfileProps) {
 			<CardContent className="space-y-6">
 				<div className="flex items-center gap-4">
 					<Avatar className="h-20 w-20">
-						<AvatarImage src={user.image || ""} alt={user.name} />
-						<AvatarFallback>{user.name.split(" ")[0][0]}</AvatarFallback>
+						<AvatarImage src={user?.image || ""} alt={user?.name} />
+						<AvatarFallback>{user?.name.split(" ")[0][0]}</AvatarFallback>
 					</Avatar>
 					<div>
-						<h3 className="text-lg font-medium">{user.name}</h3>
-						<p className="text-sm text-muted-foreground">{user.email}</p>
-						<Badge variant="outline">{user.role}</Badge>
+						<h3 className="text-lg font-medium">{user?.name}</h3>
+						<p className="text-sm text-muted-foreground">{user?.email}</p>
+						<Badge variant="outline">{user?.role}</Badge>
 					</div>
 				</div>
 
@@ -42,7 +58,7 @@ export function AccountProfile({ user }: AccountProfileProps) {
 					<div className="space-y-2">
 						<Label>What should we call you?</Label>
 						<Input
-							defaultValue={user.name}
+							defaultValue={user?.name}
 							placeholder="Enter your preferred name"
 							type="text"
 						/>
@@ -50,16 +66,13 @@ export function AccountProfile({ user }: AccountProfileProps) {
 
 					<div className="space-y-2">
 						<Label>What is your email?</Label>
-						<Input
-							defaultValue={user.email}
-							placeholder="Enter your email"
-						/>
+						<Input defaultValue={user?.email} placeholder="Enter your email" />
 						<span className="text-sm text-muted-foreground">
 							<Badge variant="outline">
-								{user.emailVerified ? "Verified" : "Unverified"}
+								{user?.emailVerified ? "Verified" : "Unverified"}
 							</Badge>
 						</span>
-						{user.emailVerified && (
+						{user?.emailVerified && (
 							<p className="text-sm text-muted-foreground">
 								You can change your email address at any time.
 							</p>
@@ -71,32 +84,23 @@ export function AccountProfile({ user }: AccountProfileProps) {
 						<Badge variant="outline">{user?.role}</Badge>
 					</div>
 
-					 <div className="space-y-2">
-						<Label>What do you do?</Label>
+					<div className="space-y-2">
+						<Label>Phone Number</Label>
 						<Input
-							// defaultValue={user.occupation} 
-							placeholder="e.g. Software Developer"
-						/>
-					</div>
-
-					{/*
-					<div className="space-y-2">
-						<Label>What traits should we know about?</Label>
-						<Textarea
-							placeholder="Enter traits separated by commas (e.g. Chatty, Witty, Opinionated)"
-							className="min-h-[100px]"
-							defaultValue={user.traits?.join(", ")}
+							type="tel"
+							placeholder="Enter your phone number"
+							defaultValue={renterPreference?.phone as string}
 						/>
 					</div>
 
 					<div className="space-y-2">
-						<Label>Anything else we should know about you?</Label>
-						<Textarea
-							placeholder="Interests, values, or preferences to keep in mind"
-							className="min-h-[100px]"
-							defaultValue={user.bio}
+						<Label>Occupation</Label>
+						<Input
+							type="text"
+							placeholder="Enter your occupation"
+							defaultValue={renterPreference?.occupation as string}
 						/>
-					</div> */}
+					</div>
 				</div>
 
 				<div className="flex justify-end">

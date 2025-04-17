@@ -28,6 +28,14 @@ export default async function AccountPage() {
 
 	const userData = await db.query.user.findFirst({
 		where: eq(schema.user.id, session.user.id),
+		with: {
+			renterPreferences: {
+				columns: {
+					phone: true,
+					occupation: true,
+				},
+			},
+		},
 	});
 
 	if (!userData) {

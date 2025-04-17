@@ -1,23 +1,22 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import { account } from "./account";
-import { session } from "./session";
-import { userRole } from "./userRole";
-import { property } from "./property";
-import { favorite } from "./favorite";
-import { searchHistory } from "./searchHistory";
-import { savedSearches } from "./savedSearches";
-import { leaseAgreements } from "./leaseAgreements";
-import { tenantFeedback } from "./tenantFeedback";
-import { rentPayments } from "./rentPayments";
-import { messages } from "./messages";
-import { notificationPreferences } from "./notificationPreferences";
-import { usageAnalytics } from "./usageAnalytics";
-import { securityLogs } from "./securityLogs";
-import { teamMember } from "./teamMember";
-import { propertyManagerFirm } from "./propertyManagerFirm";
-import { renterPreferences } from "./renterPreferences";
 import type { UserRole } from "@/types/user";
+import { relations } from "drizzle-orm";
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { account } from "./account";
+import { favorite } from "./favorite";
+import { leaseAgreements } from "./leaseAgreements";
+import { notificationPreferences } from "./notificationPreferences";
+import { property } from "./property";
+import { propertyManagerFirm } from "./propertyManagerFirm";
+import { rentPayments } from "./rentPayments";
+import { renterPreferences } from "./renterPreferences";
+import { savedSearches } from "./savedSearches";
+import { searchHistory } from "./searchHistory";
+import { securityLogs } from "./securityLogs";
+import { session } from "./session";
+import { teamMember } from "./teamMember";
+import { tenantFeedback } from "./tenantFeedback";
+import { usageAnalytics } from "./usageAnalytics";
+import { userRole } from "./userRole";
 
 /** User table for storing user information */
 export const user = pgTable("user", {
@@ -33,7 +32,7 @@ export const user = pgTable("user", {
 });
 
 /** Relations for the user table */
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ many, one }) => ({
 	accounts: many(account),
 	sessions: many(session),
 	roles: many(userRole),
@@ -52,7 +51,7 @@ export const userRelations = relations(user, ({ many }) => ({
 	securityLogs: many(securityLogs),
 	teamMembers: many(teamMember),
 	propertyManagerFirms: many(propertyManagerFirm),
-	renterPreferences: many(renterPreferences),
+	renterPreferences: one(renterPreferences),
 }));
 
 /** Type for selecting users */
