@@ -1,7 +1,9 @@
 import { AccountProfile } from "@/components/accounts/account-profile";
 import { BillingSettings } from "@/components/accounts/billing-settings";
+import { FavoriteListings } from "@/components/accounts/favorite-listings";
 import { NotificationPreferences } from "@/components/accounts/notification-preferences";
 import { RenterPreferences } from "@/components/accounts/renter-preferences";
+import { SavedSearches } from "@/components/accounts/saved-searches";
 import { SecuritySettings } from "@/components/accounts/security-settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/lib/auth";
@@ -35,6 +37,12 @@ export default async function AccountPage() {
 					occupation: true,
 				},
 			},
+			savedSearches: true,
+			favorites: {
+				with: {
+					property: true,
+				},
+			},
 		},
 	});
 
@@ -44,6 +52,45 @@ export default async function AccountPage() {
 
 	// Only show renter preferences if user is a renter
 	const isRenter = userData.role === "renter";
+
+	// Transform saved searches data
+	const savedSearches =
+		userData.savedSearches?.map((search) => {
+			const criteria = search.searchCriteria as {
+				name: string;
+				location: string;
+				minPrice: number;
+				maxPrice: number;
+				bedrooms: string;
+				newListingsCount?: number;
+			};
+
+			return {
+				id: search.id,
+				name: criteria.name,
+				location: criteria.location,
+				priceRange: {
+					min: criteria.minPrice,
+					max: criteria.maxPrice,
+				},
+				bedrooms: criteria.bedrooms,
+				lastUpdated: search.createdAt.toLocaleDateString(),
+				newListings: criteria.newListingsCount || 0,
+			};
+		}) || [];
+
+	// Transform favorite listings data
+	const favoriteListings =
+		userData.favorites?.map((favorite) => ({
+			id: favorite.property.id,
+			title: favorite.property.title,
+			address: `${favorite.property.streetAddress}, ${favorite.property.city}`,
+			bedrooms: favorite.property.bedrooms,
+			bathrooms: favorite.property.bathrooms,
+			squareFeet: favorite.property.squareFeet || 0, // Default to 0 if null
+			price: Number(favorite.property.rentAmount), // Convert string to number
+			imageUrl: favorite.property.photos?.[0],
+		})) || [];
 
 	return (
 		<div className="min-h-screen">
@@ -56,8 +103,10 @@ export default async function AccountPage() {
 				</div>
 
 				<Tabs defaultValue="account" className="space-y-6">
-					<TabsList className="max-w-4xl mx-auto">
+					<TabsList>
 						<TabsTrigger value="account">Account</TabsTrigger>
+						<TabsTrigger value="saved-searches">Saved Searches</TabsTrigger>
+						<TabsTrigger value="favorites">Favorites</TabsTrigger>
 						<TabsTrigger value="customization">Notifications</TabsTrigger>
 						<TabsTrigger value="security">Security</TabsTrigger>
 						<TabsTrigger value="billing">Billing</TabsTrigger>
@@ -74,6 +123,30 @@ export default async function AccountPage() {
 
 					<TabsContent value="account" className="space-y-6">
 						<AccountProfile user={userData} />
+					</TabsContent>
+
+					<TabsContent value="saved-searches" className="space-y-6">
+						<SavedSearches
+							searches={savedSearches}
+							onDelete={async (id) => {
+								"use server";
+								await db
+									.delete(schema.savedSearches)
+									.where(eq(schema.savedSearches.id, id));
+							}}
+						/>
+					</TabsContent>
+
+					<TabsContent value="favorites" className="space-y-6">
+						<FavoriteListings
+							listings={favoriteListings}
+							onDelete={async (id) => {
+								"use server";
+								await db
+									.delete(schema.favorite)
+									.where(eq(schema.favorite.id, id));
+							}}
+						/>
 					</TabsContent>
 
 					<TabsContent value="security" className="space-y-6">
