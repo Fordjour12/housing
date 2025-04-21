@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import PropertyInformation from "./landlord-setup/property-information";
 import RentalDetails from "./landlord-setup/rental-details";
 import ManagementPreferences from "./landlord-setup/management-preferences";
@@ -14,7 +13,7 @@ import type {
 	PropertyInformationFormValues,
 	RentalDetailsFormValues,
 	ManagementPreferencesFormValues,
-	PhotosFormValues,
+	// PhotosFormValues,
 	LandlordFormValues,
 } from "./landlord-setup/landlord-schema";
 
@@ -60,7 +59,6 @@ const INITIAL_FORM_DATA: LandlordFormValues = {
 };
 
 export default function LandlordSetup({
-	onCompleteAction,
 	onBackAction,
 }: LandlordSetupProps) {
 	const [step, setStep] = useState(1);
@@ -83,36 +81,14 @@ export default function LandlordSetup({
 		setStep(4);
 	};
 
-	const handlePhotosNext = (data: PhotosFormValues) => {
-		setFormData((prev) => ({ ...prev, photos: data }));
+	// const handlePhotosNext = (data: PhotosFormValues) => {
+	// 	setFormData((prev) => ({ ...prev, photos: data }));
+	// 	setStep(5);
+	// };
+	const handleCompletion = () => {
 		setStep(5);
-	};
+	}
 
-	const handleFinishSetup = async () => {
-		try {
-			const response = await fetch("/api/onboarding/landlord", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					...formData,
-					updateRole: true,
-				}),
-			});
-
-			if (!response.ok) {
-				const error = await response.json();
-				throw new Error(error.message || "Failed to save landlord setup");
-			}
-
-			toast.success("Landlord setup completed successfully!");
-			onCompleteAction();
-		} catch (error) {
-			console.error("Error completing landlord setup:", error);
-			toast.error("Failed to complete setup. Please try again.");
-		}
-	};
 
 	const handleBack = () => {
 		if (step === 1) {
@@ -122,18 +98,6 @@ export default function LandlordSetup({
 		}
 	};
 
-	const BottomNavigation = () => (
-		<div className="flex justify-between mt-8">
-			<Button variant="outline" onClick={handleBack}>
-				{step === 1 ? "Back to Role Selection" : "Back"}
-			</Button>
-			{step < 5 ? (
-				<Button onClick={() => setStep(step + 1)}>Continue</Button>
-			) : (
-				<Button onClick={handleFinishSetup}>Complete Setup</Button>
-			)}
-		</div>
-	);
 
 	return (
 		<div className="max-w-2xl mx-auto p-6">
@@ -189,7 +153,7 @@ export default function LandlordSetup({
 
 				{step === 4 && (
 					<ListingConfirmation
-						onNextAction={handlePhotosNext}
+						onNextAction={handleCompletion}
 						onBackAction={handleBack}
 						formData={formData}
 					/>
@@ -202,11 +166,13 @@ export default function LandlordSetup({
 							Your property has been successfully listed. You can now manage
 							your listing and view applications from potential tenants.
 						</p>
+						<Button onClick={() => router.push("/dashboard")}>
+							Go to Dashboard
+						</Button>
+						<Button onClick={() => router.push("/")}>Go Home</Button>
 					</Card>
 				)}
 			</motion.div>
-
-			{/* {step < 5 && <BottomNavigation />} */}
 		</div>
 	);
 }

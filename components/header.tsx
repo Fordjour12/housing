@@ -36,7 +36,7 @@ export default function Header({ user }: HeaderProps) {
 					{user ? (
 						<>
 							<Link
-								href="/listings"
+								href="/properties"
 								className="text-sm font-medium hover:text-primary"
 							>
 								Listings
