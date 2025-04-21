@@ -3,12 +3,11 @@
 // import { createProperty } from "@/actions/server/property";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, UploadIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+
 import type {
 	PropertyInformationFormValues,
 	RentalDetailsFormValues,
@@ -16,6 +15,7 @@ import type {
 	PhotosFormValues,
 	LandlordFormValues,
 } from "./landlord-schema";
+import { completeLandlordOnboarding } from "@/actions/server/onboarding";
 
 interface ListingConfirmationProps {
 	onNextAction: (data: PhotosFormValues) => void;
@@ -66,7 +66,6 @@ export default function ListingConfirmation({
 	const [isSaving, setIsSaving] = useState(false);
 	const [isPublishing, setIsPublishing] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const router = useRouter();
 
 	// Handle photo upload button click
 	const handleUploadClick = () => {
@@ -113,42 +112,10 @@ export default function ListingConfirmation({
 		setIsPublishing(true);
 
 		try {
-			// Make sure required fields exist
-			if (
-				!formData.property.streetAddress ||
-				!formData.property.city ||
-				!formData.property.state ||
-				!formData.property.zip ||
-				!formData.property.propertyType ||
-				!formData.property.bedrooms ||
-				!formData.property.bathrooms
-			) {
-				toast.error("Missing required property information");
-				setIsPublishing(false);
-				return;
-			}
-
-			const result = await fetch("/api/properties", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					...formData,
-					photos: { photos },
-				}),
-			});
-
-			if (result.ok) {
+			const result = await completeLandlordOnboarding(formData);
+			if (result.success) {
 				toast.success("Property listing published successfully!");
 				onNextAction({ photos });
-
-				const data = await result.json();
-				if (data.id) {
-					router.push(`/landlord/listings/${data.id}`);
-				} else {
-					router.push("/landlord/listings");
-				}
 			} else {
 				toast.error("Failed to publish listing");
 			}
@@ -161,49 +128,49 @@ export default function ListingConfirmation({
 	};
 
 	// Handle saving as draft
-	const handleSaveDraft = async () => {
-		setIsSaving(true);
-
-		try {
-			// Make sure required fields exist
-			if (
-				!formData.property.streetAddress ||
-				!formData.property.city ||
-				!formData.property.state ||
-				!formData.property.zip ||
-				!formData.property.propertyType ||
-				!formData.property.bedrooms ||
-				!formData.property.bathrooms
-			) {
-				toast.error("Missing required property information");
-				setIsSaving(false);
-				return;
-			}
-
-			const result = await fetch("/api/properties/draft", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					...formData,
-					photos: { photos },
-				}),
-			});
-
-			if (result.ok) {
-				toast.success("Property listing saved as draft!");
-				onNextAction({ photos });
-				router.push("/landlord/listings");
-			} else {
-				toast.error("Failed to save draft");
-			}
-		} catch (error) {
-			console.error("Error saving draft:", error);
-			toast.error("Failed to save draft");
-		} finally {
-			setIsSaving(false);
-		}
+	const handleSaveDraft = () => {
+		toast("coming soon", {
+			description: "This feature is coming soon!",
+		});
+		// setIsSaving(true);
+		// try {
+		// 	// Make sure required fields exist
+		// 	if (
+		// 		!formData.property.streetAddress ||
+		// 		!formData.property.city ||
+		// 		!formData.property.state ||
+		// 		!formData.property.zip ||
+		// 		!formData.property.propertyType ||
+		// 		!formData.property.bedrooms ||
+		// 		!formData.property.bathrooms
+		// 	) {
+		// 		toast.error("Missing required property information");
+		// 		setIsSaving(false);
+		// 		return;
+		// 	}
+		// 	const result = await fetch("/api/properties/draft", {
+		// 		method: "POST",
+		// 		headers: {
+		// 			"Content-Type": "application/json",
+		// 		},
+		// 		body: JSON.stringify({
+		// 			...formData,
+		// 			photos: { photos },
+		// 		}),
+		// 	});
+		// 	if (result.ok) {
+		// 		toast.success("Property listing saved as draft!");
+		// 		onNextAction({ photos });
+		// 		router.push("/landlord/listings");
+		// 	} else {
+		// 		toast.error("Failed to save draft");
+		// 	}
+		// } catch (error) {
+		// 	console.error("Error saving draft:", error);
+		// 	toast.error("Failed to save draft");
+		// } finally {
+		// 	setIsSaving(false);
+		// }
 	};
 
 	return (
@@ -357,7 +324,8 @@ export default function ListingConfirmation({
 							<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 								{photos.map((photo, index) => (
 									<div
-										key={`photo-${photo.substring(0, 10)}`}
+										id={`photo-${index + 1}`}
+										key={`photo-${index}-${btoa(photo).substring(0, 8)}`}
 										className="relative group"
 									>
 										<img
@@ -424,19 +392,8 @@ export default function ListingConfirmation({
 					Back
 				</Button>
 				<div className="flex gap-4">
-					<Button
-						variant="outline"
-						onClick={handleSaveDraft}
-						disabled={isSaving || isPublishing}
-					>
-						{isSaving ? (
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								Saving...
-							</>
-						) : (
-							"Save as Draft"
-						)}
+					<Button variant="outline" onClick={handleSaveDraft}>
+						Save as Draft
 					</Button>
 					<Button
 						onClick={handlePublish}

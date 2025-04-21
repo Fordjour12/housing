@@ -8,7 +8,7 @@ import { z } from "zod";
 import { headers } from "next/headers";
 import { nanoid } from "nanoid";
 import type { UserRole } from "@/types/user";
-import type { Permissions } from "@/schema/role";
+import  {type LandlordFormValues ,landlordFormSchema} from "@/components/onboarding/landlord-setup/landlord-schema";
 
 const renterFormSchema = z.object({
 	profile: z.object({
@@ -41,6 +41,12 @@ const renterFormSchema = z.object({
 
 export type RenterFormValues = z.infer<typeof renterFormSchema>;
 
+/**
+ * Completes the renter onboarding process.
+ * 
+ * @param data - The form data containing renter information.
+ * @returns {Promise<{ success: boolean }>} - A promise that resolves to a success status.
+ */
 export async function completeRenterOnboarding(data: RenterFormValues) {
 	try {
 		const session = await auth.api.getSession({ headers: await headers() });
@@ -144,6 +150,12 @@ export async function completeRenterOnboarding(data: RenterFormValues) {
 	}
 }
 
+/**
+ * Updates or creates a user role in the database.
+ * 
+ * @param role - The role to update or create.
+ * @returns {Promise<{ success: boolean }>} - A promise that resolves to a success status.
+ */
 export async function updateOrCreateUserRole(role: UserRole) {
 	try {
 		const session = await auth.api.getSession({ headers: await headers() });
@@ -211,3 +223,159 @@ export async function updateOrCreateUserRole(role: UserRole) {
 		};
 	}
 }
+
+/**
+ * Completes the landlord onboarding process.
+ * 
+ * @param data - The form data containing property and rental information.
+ * @returns {Promise<{ success: boolean }>} - A promise that resolves to a success status.
+ */
+
+export async function completeLandlordOnboarding(rawData: LandlordFormValues) {
+	try {
+		const session = await auth.api.getSession({ headers: await headers() });
+		if (!session?.user?.id) {
+			return { error: "Unauthorized" };
+		}
+		const data = landlordFormSchema.parse(rawData);
+
+		await db.transaction(async (tx) => {
+			// Create the property listing
+			const propertyId = nanoid();
+			await tx.insert(schema.property).values({
+				id: propertyId,
+				title: `${data.property.streetAddress}, ${data.property.city}`,
+				description: data.rental.description || "",
+				streetAddress: data.property.streetAddress,
+				unitNumber: data.property.unitNumber,
+				city: data.property.city,
+				state: data.property.state,
+				zip: data.property.zip,
+				propertyType: data.property.propertyType,
+				bedrooms: Number.parseInt(data.property.bedrooms) || 0,
+				bathrooms: Number.parseInt(data.property.bathrooms) || 0,
+				squareFeet: data.property.squareFootage
+					? Number.parseInt(data.property.squareFootage)
+					: null,
+				yearBuilt: data.property.yearBuilt,
+				rentAmount: data.rental.rentAmount,
+				securityDeposit: data.rental.securityDeposit,
+				leaseDurations: data.rental.leaseDurations,
+				availabilityDate: data.rental.availabilityDate,
+				amenities: data.rental.amenities,
+				petPolicy: data.rental.petPolicy,
+				petRestrictions: data.rental.petRestrictions,
+				utilitiesIncluded: data.rental.utilitiesIncluded,
+				contactDisplay: data.management.contactDisplay,
+				applicationProcess: data.management.applicationProcess,
+				screeningPreferences: data.management.screeningPreferences,
+				communicationPreferences: data.management.communicationPreferences,
+				leaseSigningPreference: data.management.leaseSigningPreference,
+				photos: data.photos.photos,
+				ownerId: session.user.id,
+				status: "active",
+			});
+
+			// Update user's onboarding status
+			await tx
+				.update(schema.user)
+				.set({
+					onboardingCompleted: true,
+					updatedAt: new Date(),
+				})
+				.where(eq(schema.user.id, session.user.id));
+		});
+
+		return { success: true };
+	} catch (error) {
+		console.error("Error in landlord onboarding:", error);
+		if (error instanceof z.ZodError) {
+			return { error: "Invalid form data", details: error.errors };
+		}
+		return {
+			error: "Failed to complete landlord setup",
+			message: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+
+export async function createLandlordListing(data: LandlordFormValues) {
+	console.log("data", data);
+}
+
+export async function updateLandlordListing(data: LandlordFormValues) {
+	console.log("data", data);
+}
+
+export async function deleteLandlordListing(data: LandlordFormValues) {
+	console.log("data", data);
+}
+
+/**
+ * Saves a draft property listing for a landlord.
+ * 
+ * @param data - The form data containing property and rental information.
+ * @returns {Promise<{ success: boolean }>} - A promise that resolves to a success status.
+ */
+/*
+export async function saveDraftLandlordListing(data: LandlordFormValues) {
+	try {
+		const session = await auth.api.getSession({ headers: await headers() });
+		if (!session?.user?.id) {
+			return { error: "Unauthorized" };
+		}
+
+		await db.transaction(async (tx) => {
+			// Create the property listing as a draft
+			await tx.insert(schema.property).values({
+				title: data.property.streetAddress
+					? `${data.property.streetAddress}, ${data.property.city}`
+					: "Untitled Draft",
+				description: String(data.rental.description) || "",
+				streetAddress: String(data.property.streetAddress) || "",
+				unitNumber: String(data.property.unitNumber) || "",
+				city: String(data.property.city) || "",
+				state: String(data.property.state) || "",
+				zip: String(data.property.zip) || "",
+				propertyType: String(data.property.propertyType)	 || "",
+				bedrooms: data.property.bedrooms
+					? Number.parseInt(data.property.bedrooms)
+					: "",
+				bathrooms: data.property.bathrooms
+					? Number.parseInt(data.property.bathrooms)
+					: "",
+				squareFeet: data.property.squareFootage
+					? Number.parseInt(data.property.squareFootage)
+					: "",
+				yearBuilt: data.property.yearBuilt || "",
+				rentAmount: data.rental.rentAmount || "",
+				securityDeposit: data.rental.securityDeposit || "",
+				leaseDurations: data.rental.leaseDurations || [],
+				availabilityDate: data.rental.availabilityDate || "",
+				amenities: data.rental.amenities || [],
+				petPolicy: data.rental.petPolicy || "",
+				petRestrictions: data.rental.petRestrictions || "",
+				utilitiesIncluded: data.rental.utilitiesIncluded || [],
+				contactDisplay: data.management.contactDisplay || "",
+				applicationProcess: data.management.applicationProcess || "",
+				screeningPreferences: data.management.screeningPreferences || [],
+				communicationPreferences:
+					data.management.communicationPreferences || [],
+				leaseSigningPreference: data.management.leaseSigningPreference || "",
+				photos: data.photos.photos || [],
+				ownerId: session.user.id,
+				status: "draft",
+				propertyManagerId: String(session.user.id),
+			});
+		});
+
+		return { success: true };
+	} catch (error) {
+		console.error("Error saving draft listing:", error);
+		return {
+			error: "Failed to save draft listing",
+			message: error instanceof Error ? error.message : String(error),
+		};
+	}
+}
+*/

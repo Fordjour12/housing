@@ -24,6 +24,7 @@ export const propertyStatusEnum = pgEnum("property_status", [
 	"active",
 	"pending",
 	"inactive",
+	"draft",
 ]);
 
 /** Property table for managing rental properties */
